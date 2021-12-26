@@ -1,0 +1,5 @@
+<resources>
+    <string name="app_name">BLECapturer</string>
+    <string name="server">Server</string>
+    <string name="capture_ble">BLE Capture</string>
+</resources>
