@@ -2,4 +2,9 @@
     <string name="app_name">BLECapturer</string>
     <string name="server">Server</string>
     <string name="capture_ble">BLE Capture</string>
+
+    <string name="mac">MAC</string>
+    <string name="protocol">Protocol</string>
+    <string name="power">Power</string>
+
 </resources>

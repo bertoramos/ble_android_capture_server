@@ -9,13 +9,13 @@
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/serverFragmentContainerView"
-        android:name="com.ips.blecapturer.fragments.ServerFragment"
+        android:name="com.ips.blecapturer.view.fragments.ServerFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/bleFragmentContainerView"
-        android:name="com.ips.blecapturer.fragments.BleFragment"
+        android:name="com.ips.blecapturer.view.fragments.BleFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 

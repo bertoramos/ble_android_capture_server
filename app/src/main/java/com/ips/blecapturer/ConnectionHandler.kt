@@ -36,7 +36,9 @@ object ConnectionHandler {
 
     fun wasAck(ackPid: Long): Boolean {
         if(server != null) {
-            for (packet in server!!.buffer){
+            val size = server!!.buffer.size
+            for(i in 0 until size) {
+                val packet = server!!.buffer[i]
                 if (packet.ptype == AckPacket.PTYPE) {
                     if((packet as AckPacket).ackPid == ackPid) return true
                 }

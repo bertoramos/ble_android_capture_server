@@ -1,4 +1,4 @@
-package com.ips.blecapturer.fragments
+package com.ips.blecapturer.view.fragments
 
 import android.content.Context
 import android.net.wifi.WifiManager
@@ -13,7 +13,6 @@ import android.widget.ToggleButton
 import androidx.fragment.app.Fragment
 import com.ips.blecapturer.ConnectionHandler
 import com.ips.blecapturer.R
-import java.util.*
 
 
 class ServerFragment : Fragment() {

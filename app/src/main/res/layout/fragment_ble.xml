@@ -1,27 +1,73 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".fragments.BleFragment">
+    tools:context=".view.fragments.BleFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="horizontal">
+        android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/captureTextView"
-            android:layout_width="112dp"
-            android:layout_height="32dp"
-            android:text="@string/capture_ble" />
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="59dp"
+            android:orientation="horizontal">
 
-        <ToggleButton
-            android:id="@+id/toggleCaptureButton"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="ToggleButton" />
+            <TextView
+                android:id="@+id/captureTextView"
+                android:layout_width="112dp"
+                android:layout_height="32dp"
+                android:text="@string/capture_ble" />
 
+            <ToggleButton
+                android:id="@+id/toggleCaptureButton"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="ToggleButton" />
+
+        </LinearLayout>
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="27dp">
+
+            <TextView
+                android:id="@+id/macLabelHeader"
+                android:layout_width="115dp"
+                android:layout_height="28dp"
+                android:text="@string/mac"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/protocolLabelHeader"
+                android:layout_width="0dp"
+                android:layout_height="match_parent"
+                android:layout_marginStart="12dp"
+                android:text="@string/protocol"
+                app:layout_constraintStart_toEndOf="@+id/macLabelHeader"
+                tools:layout_editor_absoluteY="0dp" />
+
+            <TextView
+                android:id="@+id/powerLabelHeader"
+                android:layout_width="58dp"
+                android:layout_height="22dp"
+                android:layout_marginStart="44dp"
+                android:layout_marginTop="4dp"
+                android:text="@string/power"
+                app:layout_constraintStart_toEndOf="@+id/protocolLabelHeader"
+                app:layout_constraintTop_toTopOf="parent" />
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/ble_devices_list"
+            android:layout_width="match_parent"
+            android:layout_height="151dp"
+            tools:listitem="@layout/ble_device_item" />
     </LinearLayout>
 
 </FrameLayout>

@@ -10,13 +10,13 @@ import android.os.Build
 import android.os.ParcelUuid
 import android.util.Log
 import androidx.annotation.RequiresApi
-import androidx.lifecycle.ViewModel
-import com.ips.blecapturer.models.BLESharedViewModel
-import com.ips.blecapturer.models.Beacon
+import com.ips.blecapturer.model.BLESharedViewModel
+import com.ips.blecapturer.model.Beacon
+import com.ips.blecapturer.model.BeaconWhiteList
 
 // Inspiration:
-// https://medium.com/@nithinjith.p/ble-in-android-kotlin-c485f0e83c16
-// https://medium.com/geekculture/android-ble-scanner-to-scan-for-ibeacon-and-eddystone-96a0c0610d3d
+//  https://medium.com/@nithinjith.p/ble-in-android-kotlin-c485f0e83c16
+//  https://medium.com/geekculture/android-ble-scanner-to-scan-for-ibeacon-and-eddystone-96a0c0610d3d
 
 object BLEScanner {
 
@@ -25,6 +25,20 @@ object BLEScanner {
     private lateinit var btManager: BluetoothManager
 
     private lateinit var bleViewModel: BLESharedViewModel
+
+    private var beaconWhiteList: BeaconWhiteList = BeaconWhiteList()
+
+    fun allowBeacon(mac: String, protocol: Beacon.Protocol) {
+        beaconWhiteList.addBeacon(mac, protocol)
+    }
+
+    fun denyBeacon(mac: String, protocol: Beacon.Protocol) {
+        beaconWhiteList.removeBeacon(mac, protocol)
+    }
+
+    fun allowAllBeacons() {
+        beaconWhiteList.clearAll()
+    }
 
     @RequiresApi(Build.VERSION_CODES.M)
     fun setupBLEManager(context: Context, viewModel: BLESharedViewModel) : Boolean
@@ -81,15 +95,17 @@ object BLEScanner {
                 }
             }
 
+            var allowed = false
             if(deviceAddress != null) {
                 val beacon = Beacon(deviceAddress)
                 beacon.name = deviceName
                 beacon.protocol = beacon_type
                 beacon.rssi = rssi
                 bleViewModel.addBeacon(beacon)
+                allowed = beaconWhiteList.filter(beacon)
             }
 
-            Log.d("BLEScan", "Name : $deviceName Address : $deviceAddress RSSI : $rssi TYPE : $beacon_type   NDEVICES = ${bleViewModel.visibleBeacons()}" )
+            Log.d("BLEScan", "Name : $deviceName Address : $deviceAddress RSSI : $rssi TYPE : $beacon_type   NDEVICES = ${bleViewModel.visibleBeacons()}  ALLOWED : $allowed" )
         }
     }
 

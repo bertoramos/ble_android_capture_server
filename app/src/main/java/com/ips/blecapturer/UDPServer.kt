@@ -154,12 +154,15 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
             // Start capture thread
             thread(start=true) {
                 val captureTime = ((packet as StartCapturePacket).captureTime * 1000).toLong()
+
+                BLEScanner.startScanner()
                 sleep(captureTime)
+                BLEScanner.stopScanner()
 
                 last_pid_sent += 1
                 val pid = last_pid_sent
                 ConnectionHandler.sendEndCapture(pid)
-                buffer.remove(packet)
+                // buffer.remove(packet)
             }
         }
     }

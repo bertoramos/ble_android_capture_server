@@ -1,4 +1,4 @@
-package com.ips.blecapturer.fragments
+package com.ips.blecapturer.view.fragments
 
 import android.Manifest
 import android.app.AlertDialog
@@ -7,17 +7,21 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ToggleButton
 import androidx.annotation.RequiresApi
-import androidx.fragment.app.activityViewModels
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.Observer
+import androidx.recyclerview.widget.LinearLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import com.ips.blecapturer.BLEScanner
 import com.ips.blecapturer.R
-import com.ips.blecapturer.models.BLESharedViewModel
+import com.ips.blecapturer.model.BLESharedViewModel
+import com.ips.blecapturer.view.BleDeviceAdapter
 
 class BleFragment : Fragment() {
 
@@ -44,7 +48,35 @@ class BleFragment : Fragment() {
 
         checkLocationPermissions()
 
-        val scanButton = inflaterView.findViewById<ToggleButton>(R.id.toggleCaptureButton)
+        scanButtonSetup(inflaterView)
+
+        bleDevicesList(inflaterView)
+
+        return inflaterView
+    }
+
+    fun bleDevicesList(view: View) {
+        val beaconsList: RecyclerView = view.findViewById(R.id.ble_devices_list)
+        val beaconAdapter = BleDeviceAdapter()
+        beaconsList.adapter = beaconAdapter
+
+        beaconsList.layoutManager = LinearLayoutManager(context)
+
+        ble_model.beacons_live_map.observe(this, Observer { it ->
+            val collection = it.values
+            val list = ArrayList(collection)
+
+            beaconAdapter.devices = list
+            beaconAdapter.notifyDataSetChanged()
+
+            Log.d("BLE_LIST", "New beacon ${list.size}")
+        })
+
+    }
+
+    @RequiresApi(Build.VERSION_CODES.M)
+    private fun scanButtonSetup(view: View) {
+        val scanButton = view.findViewById<ToggleButton>(R.id.toggleCaptureButton)
         scanButton.setOnClickListener {
             val locationPermissionGranted = activity!!.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
             val bleActive = BLEScanner.isEnabled()
@@ -67,8 +99,6 @@ class BleFragment : Fragment() {
                 }
             } else BLEScanner.stopScanner()
         }
-
-        return inflaterView
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
