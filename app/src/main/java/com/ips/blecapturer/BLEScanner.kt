@@ -40,6 +40,12 @@ object BLEScanner {
         beaconWhiteList.clearAll()
     }
 
+    fun getFromWhiteList(position: Int): Pair<String, Beacon.Protocol> {
+        return beaconWhiteList.getBeacon(position)
+    }
+
+    fun getWhiteListSize(): Int = beaconWhiteList.size()
+
     @RequiresApi(Build.VERSION_CODES.M)
     fun setupBLEManager(context: Context, viewModel: BLESharedViewModel) : Boolean
     {
@@ -77,7 +83,7 @@ object BLEScanner {
             val deviceAddress = result?.device?.address
             val rssi = result?.rssi
 
-            var beacon_type = Beacon.Protocol.ANY
+            var beacon_type = Beacon.Protocol.OTHER
 
             val scanRecord = result?.scanRecord
 

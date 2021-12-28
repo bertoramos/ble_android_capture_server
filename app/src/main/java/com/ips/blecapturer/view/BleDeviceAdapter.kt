@@ -7,7 +7,6 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import com.ips.blecapturer.R
 import com.ips.blecapturer.model.Beacon
-import org.w3c.dom.Text
 
 class BleDeviceAdapter : RecyclerView.Adapter<BleDeviceAdapter.BleDeviceHolder>() {
 
@@ -35,11 +34,7 @@ class BleDeviceAdapter : RecyclerView.Adapter<BleDeviceAdapter.BleDeviceHolder>(
 
         fun bind(beacon: Beacon) {
             mac.text = beacon.mac
-            protocol.text = when(beacon.protocol) {
-                Beacon.Protocol.ANY -> "Unknown"
-                Beacon.Protocol.IBEACON -> "Ibeacon"
-                Beacon.Protocol.EDDYSTONE -> "Eddystone"
-            }
+            protocol.text = beacon.protocol.toString()
             rssi.text = "${beacon.rssi} dBm"
         }
     }

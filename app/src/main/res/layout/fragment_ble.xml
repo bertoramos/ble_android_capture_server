@@ -54,9 +54,8 @@
             <TextView
                 android:id="@+id/powerLabelHeader"
                 android:layout_width="58dp"
-                android:layout_height="22dp"
+                android:layout_height="27dp"
                 android:layout_marginStart="44dp"
-                android:layout_marginTop="4dp"
                 android:text="@string/power"
                 app:layout_constraintStart_toEndOf="@+id/protocolLabelHeader"
                 app:layout_constraintTop_toTopOf="parent" />
@@ -68,6 +67,7 @@
             android:layout_width="match_parent"
             android:layout_height="151dp"
             tools:listitem="@layout/ble_device_item" />
+
     </LinearLayout>
 
 </FrameLayout>

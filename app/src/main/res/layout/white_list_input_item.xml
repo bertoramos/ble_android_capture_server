@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:mask="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <br.com.sapereaude.maskedEditText.MaskedEditText
+        android:id="@+id/macInputFilter"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="000000000000"
+        mask:allowed_chars="0123456789ABCDEF"
+        mask:mask="##:##:##:##:##:##" />
+
+    <Spinner
+        android:id="@+id/protocolSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="40dp"
+        android:spinnerMode="dropdown" />
+</LinearLayout>

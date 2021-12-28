@@ -55,14 +55,14 @@ class BleFragment : Fragment() {
         return inflaterView
     }
 
-    fun bleDevicesList(view: View) {
+    private fun bleDevicesList(view: View) {
         val beaconsList: RecyclerView = view.findViewById(R.id.ble_devices_list)
         val beaconAdapter = BleDeviceAdapter()
         beaconsList.adapter = beaconAdapter
 
         beaconsList.layoutManager = LinearLayoutManager(context)
 
-        ble_model.beacons_live_map.observe(this, Observer { it ->
+        ble_model.beacons_live_map.observe(this, { it ->
             val collection = it.values
             val list = ArrayList(collection)
 

@@ -3,13 +3,22 @@ package com.ips.blecapturer.model
 data class Beacon(public var mac: String) {
 
     enum class Protocol {
-        ANY,
+        OTHER,
         IBEACON,
-        EDDYSTONE
+        EDDYSTONE,;
+
+        override fun toString(): String {
+            return when(this) {
+                OTHER -> "Other"
+                IBEACON -> "IBeacon"
+                EDDYSTONE -> "Eddystone"
+            }
+        }
     }
 
+
     var name: String? = null
-    var protocol: Protocol = Protocol.ANY
+    var protocol: Protocol = Protocol.OTHER
     var rssi: Int? = null
 
     override fun equals(other: Any?): Boolean {

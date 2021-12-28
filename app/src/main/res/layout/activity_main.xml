@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    tools:context=".MainActivity" >
+    tools:context=".view.activities.MainActivity" >
 
     <androidx.fragment.app.FragmentContainerView
         android:id="@+id/serverFragmentContainerView"
@@ -18,5 +18,11 @@
         android:name="com.ips.blecapturer.view.fragments.BleFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
+
+    <Button
+        android:id="@+id/whiteListButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/white_list" />
 
 </LinearLayout>
