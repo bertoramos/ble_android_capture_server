@@ -7,12 +7,16 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import br.com.sapereaude.maskedEditText.MaskedEditText
+import com.ips.blecapturer.BLEScanner
 import com.ips.blecapturer.R
 import com.ips.blecapturer.model.Beacon
 import com.ips.blecapturer.view.WhiteListAdapter
 
 
 class WhiteListActivity : AppCompatActivity() {
+
+    private lateinit var whiteListAdapter: WhiteListAdapter
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_white_list)
@@ -38,10 +42,14 @@ class WhiteListActivity : AppCompatActivity() {
             "OK"
         ) { _, _ ->
             val macEditText = customLayout.findViewById<MaskedEditText>(R.id.macInputFilter)
-            val macValue = macEditText.text
+            val macValue = macEditText.text.toString()
             val protocolSpinner = customLayout.findViewById<Spinner>(R.id.protocolSpinner)
-            val protocolValue = protocolSpinner.selectedItem
+            val protocolValue = protocolSpinner.selectedItem as Beacon.Protocol
             Toast.makeText(applicationContext, "$macValue $protocolValue", Toast.LENGTH_LONG).show()
+
+            BLEScanner.allowBeacon(macValue, protocolValue)
+            whiteListAdapter.notifyDataSetChanged()
+
         }
         alertDialog.setNegativeButton("Cancel", null)
 
@@ -56,5 +64,7 @@ class WhiteListActivity : AppCompatActivity() {
         whiteList.adapter = adapter
 
         whiteList.layoutManager = LinearLayoutManager(applicationContext)
+
+        whiteListAdapter = adapter
     }
 }
