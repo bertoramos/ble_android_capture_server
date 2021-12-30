@@ -3,55 +3,34 @@ package com.ips.blecapturer.model.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
+import android.util.Log
 import com.ips.blecapturer.model.Beacon
 import com.ips.blecapturer.model.database.tables.Capture
 import com.ips.blecapturer.model.database.tables.Frame
 import java.io.*
 
-class CampaignDatabaseHelper(val context: Context, private val database_name: String): SQLiteOpenHelper(context, database_name, null, DATABASE_VERSION) {
+class CampaignDatabaseHelper(val context: Context, private val database_name: String): SQLiteOpenHelper(context, "$database_name$DB_EXTENSION", null, DATABASE_VERSION) {
 
     companion object {
         private val DATABASE_VERSION = 1
+        private val DB_EXTENSION = ".db"
     }
 
-    val DROP_CAPTURE_TABLE = "DROP TABLE IF EXISTS ${Capture.TABLE_NAME}"
-
-    val CREATE_CAPTURE_TABLE = "CREATE TABLE ${Capture.TABLE_NAME}" +
-            "(" +
-                "capture_id" + " BIGINT PRIMARY KEY, " +
-                "x_co" + " REAL, " +
-                "y_co" + " REAL, " +
-                "z_co" + " REAL " +
-            ")"
-
-    val DROP_FRAME_TABLE = "DROP TABLE IF EXISTS ${Frame.TABLE_NAME}"
-
-    val CREATE_FRAME_TABLE = "CREATE TABLE ${Frame.TABLE_NAME}" +
-            "(" +
-                "frame_id" + " BIGINT PRIMARY KEY," +
-                "mac" + " VARCHAR(20)," +
-                "protocol" + " TEXT CHECK( protocol IN ('${Beacon.Protocol.EDDYSTONE}', '${Beacon.Protocol.IBEACON}','${Beacon.Protocol.OTHER}') ) NOT NULL DEFAULT '${Beacon.Protocol.OTHER}'," +
-                "rssi" + " INT," +
-                "capture_id_fk" + " BIGINT," +
-                "FOREIGN KEY(capture_id_fk) REFERENCES capture(capture_id)" +
-            ")"
-
-    val database_file_name = "$database_name.db"
+    val database_file_name = "$database_name$DB_EXTENSION"
 
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(DROP_CAPTURE_TABLE)
-        db.execSQL(DROP_FRAME_TABLE)
-        db.execSQL(CREATE_CAPTURE_TABLE)
-        db.execSQL(CREATE_FRAME_TABLE)
+        db.execSQL(Capture.DROP_TABLE)
+        db.execSQL(Frame.DROP_TABLE)
+        db.execSQL(Capture.CREATE_TABLE)
+        db.execSQL(Frame.CREATE_TABLE)
     }
 
-    override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {
-
-    }
+    override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {  }
 
     fun copy() {
-        val db = File("/data/data/" + context.packageName + "/databases/$database_file_name")
-
+        //Log.d("COPYDB", "${context.packageName} $database_name $database_file_name ${this.databaseName} ${this.writableDatabase.path} ${this.readableDatabase.path}")
+        //val db = File("/data/data/" + context.packageName + "/databases/$database_file_name")
+        val db = File(this.writableDatabase.path)
         try {
             val inputStream: InputStream = FileInputStream(db)
 

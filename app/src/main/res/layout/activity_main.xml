@@ -25,4 +25,22 @@
         android:layout_height="wrap_content"
         android:text="@string/white_list" />
 
+    <Button
+        android:id="@+id/createDatabaseMockUp"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Create db mockup" />
+
+    <Button
+        android:id="@+id/insertCaptureMockup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Insert Capture Mockup" />
+
+    <Button
+        android:id="@+id/insertFrameMockup"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Insert Frame Mockup" />
+
 </LinearLayout>
