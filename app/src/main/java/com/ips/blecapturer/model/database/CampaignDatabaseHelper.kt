@@ -3,10 +3,8 @@ package com.ips.blecapturer.model.database
 import android.content.Context
 import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
-import android.util.Log
-import com.ips.blecapturer.model.Beacon
 import com.ips.blecapturer.model.database.tables.Capture
-import com.ips.blecapturer.model.database.tables.Frame
+import com.ips.blecapturer.model.database.tables.Scan
 import java.io.*
 
 class CampaignDatabaseHelper(val context: Context, private val database_name: String): SQLiteOpenHelper(context, "$database_name$DB_EXTENSION", null, DATABASE_VERSION) {
@@ -20,9 +18,9 @@ class CampaignDatabaseHelper(val context: Context, private val database_name: St
 
     override fun onCreate(db: SQLiteDatabase) {
         db.execSQL(Capture.DROP_TABLE)
-        db.execSQL(Frame.DROP_TABLE)
+        db.execSQL(Scan.DROP_TABLE)
         db.execSQL(Capture.CREATE_TABLE)
-        db.execSQL(Frame.CREATE_TABLE)
+        db.execSQL(Scan.CREATE_TABLE)
     }
 
     override fun onUpgrade(db: SQLiteDatabase, p1: Int, p2: Int) {  }

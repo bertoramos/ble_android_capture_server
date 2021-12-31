@@ -13,6 +13,7 @@ import androidx.annotation.RequiresApi
 import com.ips.blecapturer.model.BLESharedViewModel
 import com.ips.blecapturer.model.Beacon
 import com.ips.blecapturer.model.BeaconWhiteList
+import com.ips.blecapturer.model.database.DatabaseViewModel
 
 // Inspiration:
 //  https://medium.com/@nithinjith.p/ble-in-android-kotlin-c485f0e83c16
@@ -25,6 +26,7 @@ object BLEScanner {
     private lateinit var btManager: BluetoothManager
 
     private lateinit var bleViewModel: BLESharedViewModel
+    private lateinit var databaseViewModel: DatabaseViewModel
 
     private var beaconWhiteList: BeaconWhiteList = BeaconWhiteList()
 
@@ -47,13 +49,14 @@ object BLEScanner {
     fun getWhiteListSize(): Int = beaconWhiteList.size()
 
     @RequiresApi(Build.VERSION_CODES.M)
-    fun setupBLEManager(context: Context, viewModel: BLESharedViewModel) : Boolean
+    fun setupBLEManager(context: Context, bleViewModel: BLESharedViewModel, databaseViewModel: DatabaseViewModel) : Boolean
     {
         btManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         btAdapter = btManager.adapter
         btScanner = btAdapter.bluetoothLeScanner
 
-        bleViewModel = viewModel
+        this.bleViewModel = bleViewModel
+        this.databaseViewModel = databaseViewModel
 
         return !btAdapter.isEnabled
     }
@@ -65,6 +68,7 @@ object BLEScanner {
     fun startScanner()
     {
         btScanner.startScan(leScanCallback)
+        // TODO: agregar captura a DB
     }
 
     fun stopScanner()
@@ -73,32 +77,34 @@ object BLEScanner {
     }
 
     private val leScanCallback: ScanCallback = object : ScanCallback() {
+
+        override fun onScanFailed(errorCode: Int) {
+            // TODO: Control de error
+            super.onScanFailed(errorCode)
+        }
+
+
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
-
-            var iBeaconManufacturerId: Int = 0x004c
-            var eddystoneServiceId : ParcelUuid = ParcelUuid.fromString("0000FEAA-0000-1000-8000-00805F9B34FB")
-
-            val deviceName = result?.device?.name
-            val deviceAddress = result?.device?.address
-            val rssi = result?.rssi
-
-            var beacon_type = Beacon.Protocol.OTHER
-
+            val device = result?.device
             val scanRecord = result?.scanRecord
 
+            val deviceAddress = device?.address
+            val deviceName = device?.name
+            var beacon_type = Beacon.Protocol.OTHER
+            val rssi = result?.rssi
+            val txpower = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) result?.txPower else 0
+
+            // GET BEACON TYPE
             if(scanRecord != null)
             {
+                var iBeaconManufacturerId = 0x004c
+                var eddystoneServiceId : ParcelUuid = ParcelUuid.fromString("0000FEAA-0000-1000-8000-00805F9B34FB")
+
                 val serviceUuids = scanRecord.serviceUuids
-
-                if(serviceUuids != null && serviceUuids.size > 0 && serviceUuids.contains(eddystoneServiceId)) {
-                    beacon_type = Beacon.Protocol.EDDYSTONE
-                }
-
+                if(serviceUuids != null && serviceUuids.size > 0 && serviceUuids.contains(eddystoneServiceId)) beacon_type = Beacon.Protocol.EDDYSTONE
                 val iBeaconManufactureData = scanRecord.getManufacturerSpecificData(iBeaconManufacturerId)
-                if(iBeaconManufactureData != null && iBeaconManufactureData.size >= 23) {
-                    beacon_type = Beacon.Protocol.IBEACON
-                }
+                if(iBeaconManufactureData != null && iBeaconManufactureData.size >= 23) beacon_type = Beacon.Protocol.IBEACON
             }
 
             var allowed = false
@@ -107,11 +113,22 @@ object BLEScanner {
                 beacon.name = deviceName
                 beacon.protocol = beacon_type
                 beacon.rssi = rssi
+                beacon.txpower = txpower
                 bleViewModel.addBeacon(beacon)
                 allowed = beaconWhiteList.filter(beacon)
             }
 
-            Log.d("BLEScan", "Name : $deviceName Address : $deviceAddress RSSI : $rssi TYPE : $beacon_type   NDEVICES = ${bleViewModel.visibleBeacons()}  ALLOWED : $allowed" )
+            Log.d("BLEScan",
+                "Name : $deviceName " +
+                     "Address : $deviceAddress " +
+                     "RSSI : $rssi " +
+                     "TYPE : $beacon_type " +
+                     "TXPOWER : $txpower " +
+                     "NDEVICES = ${bleViewModel.visibleBeacons()} " +
+                     "ALLOWED : $allowed"
+            )
+            
+            // TODO: agregar escaneo a DB
         }
     }
 

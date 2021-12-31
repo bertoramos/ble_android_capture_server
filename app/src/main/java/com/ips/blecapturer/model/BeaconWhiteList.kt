@@ -4,12 +4,15 @@ class BeaconWhiteList {
 
     private val beaconWhiteList = arrayListOf<Pair<String, Beacon.Protocol>>() // MAC & Protocol
 
+    /*
     init {
+
         beaconWhiteList.add(Pair("01:02:03:04:05:06", Beacon.Protocol.EDDYSTONE))
         beaconWhiteList.add(Pair("01:02:03:04:05:06", Beacon.Protocol.IBEACON))
         beaconWhiteList.add(Pair("06:05:04:03:02:01", Beacon.Protocol.EDDYSTONE))
         beaconWhiteList.add(Pair("06:05:04:03:02:01", Beacon.Protocol.IBEACON))
     }
+     */
 
     fun addBeacon(mac: String, protocol: Beacon.Protocol) {
         beaconWhiteList.add(Pair(mac, protocol))
@@ -42,7 +45,7 @@ class BeaconWhiteList {
         }
         return false
     }
-
+    
     fun filter(list: ArrayList<Beacon>) : ArrayList<Beacon> {
         val result = arrayListOf<Beacon>()
         for(beacon in list) {

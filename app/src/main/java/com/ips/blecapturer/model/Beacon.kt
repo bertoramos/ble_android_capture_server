@@ -1,6 +1,6 @@
 package com.ips.blecapturer.model
 
-data class Beacon(public var mac: String) {
+data class Beacon(var mac: String) {
 
     enum class Protocol {
         OTHER,
@@ -10,7 +10,7 @@ data class Beacon(public var mac: String) {
         override fun toString(): String {
             return when(this) {
                 OTHER -> "Other"
-                IBEACON -> "IBeacon"
+                IBEACON -> "iBeacon"
                 EDDYSTONE -> "Eddystone"
             }
         }
@@ -20,6 +20,7 @@ data class Beacon(public var mac: String) {
     var name: String? = null
     var protocol: Protocol = Protocol.OTHER
     var rssi: Int? = null
+    var txpower: Int? = null
 
     override fun equals(other: Any?): Boolean {
         val b = other as Beacon
@@ -29,4 +30,5 @@ data class Beacon(public var mac: String) {
     override fun hashCode(): Int {
         return super.hashCode()
     }
+
 }

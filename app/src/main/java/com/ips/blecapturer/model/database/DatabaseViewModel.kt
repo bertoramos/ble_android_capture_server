@@ -1,15 +1,12 @@
 package com.ips.blecapturer.model.database
 
-import android.content.ContentValues
 import android.content.Context
-import android.widget.Toast
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ips.blecapturer.model.Beacon
 import com.ips.blecapturer.model.database.tables.Capture
-import com.ips.blecapturer.model.database.tables.Frame
-import com.ips.blecapturer.model.database.tables.Position
-import kotlin.coroutines.coroutineContext
+import com.ips.blecapturer.model.database.tables.Scan
+import com.ips.blecapturer.model.database.tables.Pose
 
 class DatabaseViewModel : ViewModel() {
 
@@ -20,61 +17,61 @@ class DatabaseViewModel : ViewModel() {
         MutableLiveData<Long>()
     }
 
+    val databaseName by lazy {
+        MutableLiveData<String>()
+    }
+
     private lateinit var context: Context
 
     fun createDatabase(context: Context, databaseName: String) {
         databaseHelper.value = CampaignDatabaseHelper(context, databaseName)
         this.context = context
         databaseHelper.value!!.copy()
+
+        this.databaseName.value = databaseHelper.value!!.databaseName
+    }
+
+    fun closeDatabase() {
+        updateDatabaseFile()
+
+        databaseHelper.value = null
+        currentCaptureId.value = null
+        this.databaseName.value = ""
     }
 
     fun updateDatabaseFile() {
         databaseHelper.value?.copy()
     }
 
-    fun insertFrame(mac: String,
+    fun insertFrame(timestamp: Long,
+                    mac: String,
                     protocol: Beacon.Protocol,
                     rssi: Int): Boolean
     {
         if(currentCaptureId.value == null) return false
 
         val db = databaseHelper.value?.writableDatabase
-        val values = ContentValues().apply {
-            put(Frame.COLUMN_NAME_MAC, mac)
-            put(Frame.COLUMN_NAME_PROTOCOL, protocol.toString())
-            put(Frame.COLUMN_NAME_RSSI, rssi)
-            put(Frame.COLUMN_NAME_CAPTURE_ID_FK, currentCaptureId.value)
-        }
+        val values = Scan.insertValues(timestamp, mac, protocol, rssi, currentCaptureId.value!!)
 
-        val newRowId = db?.insert(Frame.TABLE_NAME, null, values)
+        val newRowId = db?.insert(Scan.TABLE_NAME, null, values)
 
-        val rescode = if (newRowId != null) newRowId > 0  else false
-        if(rescode) databaseHelper.value?.copy()
+        val rescode = if (newRowId != null) newRowId > 0 else false
+        if(rescode) this.updateDatabaseFile()
         return rescode
     }
 
-    fun insertCapture(position: Position): Boolean
+    fun insertCapture(timestamp: Long, pose: Pose): Boolean
     {
-
-        val xco = position.x
-        val yco = position.y
-        val zco = position.z
-
         val db_write = databaseHelper.value?.writableDatabase
-        val values = ContentValues().apply {
-            put(Capture.COLUMN_NAME_X_CO, xco)
-            put(Capture.COLUMN_NAME_Y_CO, yco)
-            put(Capture.COLUMN_NAME_Z_CO, zco)
-        }
+        val values = Capture.insertValues(timestamp, pose)
 
         val newRowId = db_write?.insert(Capture.TABLE_NAME, null, values)
 
-        databaseHelper.value?.copy()
-
         currentCaptureId.value = newRowId
 
-        return if(newRowId != null) newRowId > 0 else false
-        //return if (newRowId != null) newRowId > 0  else false
+        val rescode = if(newRowId != null) newRowId > 0 else false
+        if(rescode) this.updateDatabaseFile()
+        return rescode
     }
 
 }

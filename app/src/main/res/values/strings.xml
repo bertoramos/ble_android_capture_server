@@ -16,4 +16,9 @@
         <item>Other</item>
     </string-array>
 
+    <string name="create_campaign">Create campaign</string>
+    <string name="db_name">DB name</string>
+    <string name="db_not_created">DB not created</string>
+    <string name="close_campaign">Close campaign</string>
+
 </resources>
