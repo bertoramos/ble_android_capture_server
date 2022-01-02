@@ -79,6 +79,9 @@ class BleFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun scanButtonSetup(view: View) {
+
+        // TODO: Deshabilitar si hay una campaña activa
+        // TODO: Deshabilitar si se ha iniciado una campaña
         val scanButton = view.findViewById<ToggleButton>(R.id.toggleCaptureButton)
         scanButton.setOnClickListener {
             val locationPermissionGranted = activity!!.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
