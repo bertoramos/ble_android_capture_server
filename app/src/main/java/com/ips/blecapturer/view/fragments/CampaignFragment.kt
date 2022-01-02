@@ -1,18 +1,18 @@
 package com.ips.blecapturer.view.fragments
 
-import android.content.DialogInterface
 import android.os.Bundle
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.EditText
 import android.widget.TextView
 import android.widget.Toast
+import android.widget.ToggleButton
 import androidx.appcompat.app.AlertDialog
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.ips.blecapturer.R
+import com.ips.blecapturer.model.database.DatabaseHandler
 import com.ips.blecapturer.model.database.DatabaseViewModel
 
 
@@ -22,6 +22,8 @@ class CampaignFragment : Fragment() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        DatabaseHandler.databaseViewModel = database_view_model
     }
 
     override fun onCreateView(
@@ -33,36 +35,42 @@ class CampaignFragment : Fragment() {
 
         initView(inflatedView)
 
+
         return inflatedView
     }
 
     private fun initView(view: View)
     {
-        // TODO : sustituir botones CREAR y CERRAR CAMPAÑA por un TOGGLEBUTTON
 
-        view.findViewById<Button>(R.id.createCampaignButton).setOnClickListener {
-            val b: AlertDialog.Builder = AlertDialog.Builder(view.context)
-            b.setTitle("Enter a database name")
-            val input = EditText(view.context)
-            b.setView(input)
-            b.setPositiveButton("OK", DialogInterface.OnClickListener { dialogInterface, i ->
-                val dbname = input.text.toString()
-                database_view_model.createDatabase(view.context, dbname)
-                Toast.makeText(view.context, "Created $dbname", Toast.LENGTH_LONG).show()
-
-                //view.findViewById<TextView>(R.id.currentDatabaseName)
-
-            })
-            b.setNegativeButton("CANCEL", null)
-            b.show()
+        val toggleCampaignButton = view.findViewById<ToggleButton>(R.id.toggleCreateCloseCampaignButton)
+        toggleCampaignButton.setOnClickListener {
+            if(toggleCampaignButton.isChecked) {
+                val b: AlertDialog.Builder = AlertDialog.Builder(view.context)
+                b.setTitle("Enter a database name")
+                val input = EditText(view.context)
+                b.setView(input)
+                b.setPositiveButton("OK") { _, _ ->
+                    val dbname = input.text.toString()
+                    if(dbname.isNullOrBlank()) {
+                        toggleCampaignButton.isChecked = false
+                        Toast.makeText(view.context, "Empty campaign name", Toast.LENGTH_LONG).show()
+                    } else {
+                        DatabaseHandler.databaseViewModel?.createDatabase(view.context, dbname)
+                        Toast.makeText(view.context, "Created $dbname", Toast.LENGTH_LONG).show()
+                    }
+                }
+                b.setNegativeButton("CANCEL") { _, _ ->
+                    toggleCampaignButton.isChecked = false
+                    Toast.makeText(view.context, "Campaign not created", Toast.LENGTH_LONG).show()
+                }
+                b.show()
+            } else {
+                DatabaseHandler.databaseViewModel?.closeDatabase()
+                Toast.makeText(view.context, "Campaign was closed", Toast.LENGTH_LONG).show()
+            }
         }
 
-        view.findViewById<Button>(R.id.closeCampaignButton).setOnClickListener {
-            database_view_model.closeDatabase()
-            Toast.makeText(view.context, "Campaign was closed", Toast.LENGTH_LONG).show()
-        }
-
-        database_view_model.databaseName.observe(this, { db_name ->
+        DatabaseHandler.databaseViewModel?.databaseName?.observe(this, { db_name ->
             view.findViewById<TextView>(R.id.currentDatabaseName).text = if(db_name.isEmpty()) resources.getString(R.string.db_not_created) else db_name
             view.findViewById<TextView>(R.id.databaseNameLabel).text = if(db_name.isEmpty()) "" else resources.getString(R.string.db_name)
         })

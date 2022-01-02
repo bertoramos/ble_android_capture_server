@@ -51,10 +51,14 @@ object UDPPacker {
     fun packStartPacket(packet: StartCapturePacket): ByteArray {
         val packer = MessagePack.newDefaultBufferPacker()
         packer
-            .packArrayHeader(3)
+            .packArrayHeader(7)
             .packLong(packet.pid)
             .packInt(packet.ptype)
             .packFloat(packet.captureTime)
+            .packFloat(packet.x)
+            .packFloat(packet.y)
+            .packFloat(packet.z)
+            .packFloat(packet.yaw)
         return packer.toByteArray()
     }
 

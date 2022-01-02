@@ -13,7 +13,9 @@ import androidx.annotation.RequiresApi
 import com.ips.blecapturer.model.BLESharedViewModel
 import com.ips.blecapturer.model.Beacon
 import com.ips.blecapturer.model.BeaconWhiteList
-import com.ips.blecapturer.model.database.DatabaseViewModel
+import com.ips.blecapturer.model.database.DatabaseHandler
+import com.ips.blecapturer.model.database.tables.Pose
+import java.util.*
 
 // Inspiration:
 //  https://medium.com/@nithinjith.p/ble-in-android-kotlin-c485f0e83c16
@@ -26,7 +28,6 @@ object BLEScanner {
     private lateinit var btManager: BluetoothManager
 
     private lateinit var bleViewModel: BLESharedViewModel
-    private lateinit var databaseViewModel: DatabaseViewModel
 
     private var beaconWhiteList: BeaconWhiteList = BeaconWhiteList()
 
@@ -49,14 +50,13 @@ object BLEScanner {
     fun getWhiteListSize(): Int = beaconWhiteList.size()
 
     @RequiresApi(Build.VERSION_CODES.M)
-    fun setupBLEManager(context: Context, bleViewModel: BLESharedViewModel, databaseViewModel: DatabaseViewModel) : Boolean
+    fun setupBLEManager(context: Context, bleViewModel: BLESharedViewModel) : Boolean
     {
         btManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         btAdapter = btManager.adapter
         btScanner = btAdapter.bluetoothLeScanner
 
         this.bleViewModel = bleViewModel
-        this.databaseViewModel = databaseViewModel
 
         return !btAdapter.isEnabled
     }
@@ -68,7 +68,15 @@ object BLEScanner {
     fun startScanner()
     {
         btScanner.startScan(leScanCallback)
-        // TODO: agregar captura a DB
+
+        val x = bleViewModel.getXco() ?: 0.0f
+        val y = bleViewModel.getYco() ?: 0.0f
+        val z = bleViewModel.getZco() ?: 0.0f
+        val yaw = bleViewModel.getYaw() ?: 0.0f
+
+        val pos = Pose(x, y, z, yaw)
+        val timestamp = Date().time
+        DatabaseHandler.databaseViewModel?.insertCapture(timestamp, pos)
     }
 
     fun stopScanner()
@@ -93,7 +101,7 @@ object BLEScanner {
             val deviceName = device?.name
             var beacon_type = Beacon.Protocol.OTHER
             val rssi = result?.rssi
-            val txpower = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) result?.txPower else 0
+            val txpower = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) result?.txPower ?: 0 else 0
 
             // GET BEACON TYPE
             if(scanRecord != null)
@@ -127,8 +135,27 @@ object BLEScanner {
                      "NDEVICES = ${bleViewModel.visibleBeacons()} " +
                      "ALLOWED : $allowed"
             )
-            
-            // TODO: agregar escaneo a DB
+
+            if(deviceAddress != null && rssi != null) {
+                val timestamp = Date().time
+                DatabaseHandler.databaseViewModel?.insertScan(timestamp, deviceAddress, beacon_type, rssi, txpower)
+            }
+            /*
+            fun randomID(): String = List(2) {
+                (('A'..'F') + ('0'..'9')).random()
+            }.joinToString("")
+
+            val mac =
+                "${randomID()}:${randomID()}:${randomID()}:${randomID()}:${randomID()}:${randomID()}"
+
+            val protocolIdx = Random.nextInt(Beacon.Protocol.values().size)
+            val protocol = Beacon.Protocol.values()[protocolIdx]
+
+            val rssi = Random.nextInt(-100, 0)
+            val timestamp = Date().time
+            database_view_model.insertFrame(timestamp, mac, protocol, rssi)
+            Toast.makeText(applicationContext, "Frame inserted", Toast.LENGTH_LONG).show()
+             */
         }
     }
 

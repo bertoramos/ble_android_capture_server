@@ -2,6 +2,8 @@ package com.ips.blecapturer
 
 
 import android.util.Log
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ips.blecapturer.model.BLESharedViewModel
 import com.ips.blecapturer.packets.*
 import kotlin.math.abs
 
@@ -13,6 +15,12 @@ object ConnectionHandler {
         server = UDPServer(clientPort, serverPort)
         if(server != null) {
             server!!.start()
+        }
+    }
+
+    fun setBLESharedViewModel(viewModel: BLESharedViewModel) {
+        if(server != null) {
+            server!!.setBLESharedViewModel(viewModel)
         }
     }
 

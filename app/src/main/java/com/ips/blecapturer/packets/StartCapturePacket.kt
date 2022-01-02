@@ -1,7 +1,11 @@
 package com.ips.blecapturer.packets
 
-// TODO: Añadir x y z yaw
-class StartCapturePacket(pid: Long, val captureTime: Float) : Packet(pid, StartCapturePacket.PTYPE) {
+class StartCapturePacket(pid: Long,
+                         val captureTime: Float,
+                         val x: Float,
+                         val y : Float,
+                         val z: Float,
+                         val yaw: Float) : Packet(pid, PTYPE) {
 
     companion object {
         val PTYPE = 3

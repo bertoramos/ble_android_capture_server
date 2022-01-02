@@ -11,14 +11,20 @@ import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.ToggleButton
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import com.ips.blecapturer.BLEScanner
 import com.ips.blecapturer.ConnectionHandler
 import com.ips.blecapturer.R
+import com.ips.blecapturer.UDPServer
+import com.ips.blecapturer.model.BLESharedViewModel
 
 
 class ServerFragment : Fragment() {
 
     private val DEFAULT_CLIENT_PORT = 5558
     private val DEFAULT_SERVER_PORT = 4445
+
+    private val bleViewModel : BLESharedViewModel by viewModels()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -44,6 +50,7 @@ class ServerFragment : Fragment() {
         val serverPort = DEFAULT_SERVER_PORT
 
         ConnectionHandler.connect(clientPort, serverPort)
+        ConnectionHandler.setBLESharedViewModel(bleViewModel)
 
         val context: Context = requireContext().applicationContext
         val wm: WifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager

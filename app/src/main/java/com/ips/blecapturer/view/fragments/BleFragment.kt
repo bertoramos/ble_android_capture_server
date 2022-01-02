@@ -21,13 +21,14 @@ import androidx.recyclerview.widget.RecyclerView
 import com.ips.blecapturer.BLEScanner
 import com.ips.blecapturer.R
 import com.ips.blecapturer.model.BLESharedViewModel
+import com.ips.blecapturer.model.database.DatabaseHandler
 import com.ips.blecapturer.model.database.DatabaseViewModel
 import com.ips.blecapturer.view.BleDeviceAdapter
+import com.ips.blecapturer.view.activities.MainActivity
 
 class BleFragment : Fragment() {
 
     private val ble_model : BLESharedViewModel by viewModels()
-    private val database_model : DatabaseViewModel by viewModels()
 
     companion object {
         private const val REQUEST_ENABLE_BT = 1
@@ -45,7 +46,7 @@ class BleFragment : Fragment() {
     ): View? {
         val inflaterView = inflater.inflate(R.layout.fragment_ble, container, false)
 
-        if( BLEScanner.setupBLEManager(context!!, ble_model, database_model) )
+        if( BLEScanner.setupBLEManager(context!!, ble_model) )
             startActivityForResult(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE_BT)
 
         checkLocationPermissions()
@@ -64,7 +65,7 @@ class BleFragment : Fragment() {
 
         beaconsList.layoutManager = LinearLayoutManager(context)
 
-        ble_model.beacons_live_map.observe(this, { it ->
+        ble_model.beacons_live_map.observe(this, {
             val collection = it.values
             val list = ArrayList(collection)
 

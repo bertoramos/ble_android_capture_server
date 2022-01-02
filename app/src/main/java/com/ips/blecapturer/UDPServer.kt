@@ -1,6 +1,10 @@
 package com.ips.blecapturer
 
 import android.util.Log
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.viewmodel.compose.viewModel
+import com.ips.blecapturer.model.BLESharedViewModel
+import com.ips.blecapturer.model.database.DatabaseViewModel
 import com.ips.blecapturer.packets.ModePacket
 import com.ips.blecapturer.packets.Packet
 import com.ips.blecapturer.packets.StartCapturePacket
@@ -29,6 +33,12 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
     var socket: DatagramSocket? = null
 
     var buffer: ArrayList<Packet> = ArrayList()
+
+    private lateinit var bleViewModel: BLESharedViewModel
+
+    fun setBLESharedViewModel(bleViewModel: BLESharedViewModel) {
+        this.bleViewModel = bleViewModel
+    }
 
     fun closeSocket() {
         if(socket != null) {
@@ -153,7 +163,11 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
         if(packet.ptype == StartCapturePacket.PTYPE) {
             // Start capture thread
             thread(start=true) {
-                val captureTime = ((packet as StartCapturePacket).captureTime * 1000).toLong()
+                val startCapturePacket = (packet as StartCapturePacket)
+                val captureTime = (startCapturePacket.captureTime * 1000).toLong()
+
+                Log.d("CAPTURE_POS", "${startCapturePacket.x} ${startCapturePacket.y} ${startCapturePacket.z} ${startCapturePacket.yaw}")
+                bleViewModel.addPose(startCapturePacket.x, startCapturePacket.y, startCapturePacket.z, startCapturePacket.yaw)
 
                 BLEScanner.startScanner()
                 sleep(captureTime)

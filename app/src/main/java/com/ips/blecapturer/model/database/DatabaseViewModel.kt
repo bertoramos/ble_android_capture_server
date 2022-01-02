@@ -1,6 +1,7 @@
 package com.ips.blecapturer.model.database
 
 import android.content.Context
+import androidx.annotation.MainThread
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.ips.blecapturer.model.Beacon
@@ -43,15 +44,18 @@ class DatabaseViewModel : ViewModel() {
         databaseHelper.value?.copy()
     }
 
-    fun insertFrame(timestamp: Long,
-                    mac: String,
-                    protocol: Beacon.Protocol,
-                    rssi: Int): Boolean
+    fun insertScan(
+        timestamp: Long,
+        mac: String,
+        protocol: Beacon.Protocol,
+        rssi: Int,
+        txpower: Int
+    ): Boolean
     {
         if(currentCaptureId.value == null) return false
 
         val db = databaseHelper.value?.writableDatabase
-        val values = Scan.insertValues(timestamp, mac, protocol, rssi, currentCaptureId.value!!)
+        val values = Scan.insertValues(timestamp, mac, protocol, rssi, txpower, currentCaptureId.value!!)
 
         val newRowId = db?.insert(Scan.TABLE_NAME, null, values)
 

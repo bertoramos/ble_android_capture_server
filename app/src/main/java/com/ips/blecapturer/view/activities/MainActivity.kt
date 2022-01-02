@@ -10,8 +10,6 @@ import com.ips.blecapturer.model.database.DatabaseViewModel
 
 class MainActivity : AppCompatActivity() {
 
-    private val database_view_model: DatabaseViewModel by viewModels()
-
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)

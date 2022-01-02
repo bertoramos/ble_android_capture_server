@@ -45,9 +45,13 @@ object UDPUnpacker {
     }
 
     private fun unpackStartCapturePacket(pid: Long, ptype: Int, unpacker: MessageUnpacker, size: Int): StartCapturePacket? {
-        if(size == 3) {
+        if(size == 7) {
             val captureTime = unpacker.unpackFloat()
-            return StartCapturePacket(pid, captureTime)
+            val xco = unpacker.unpackFloat()
+            val yco = unpacker.unpackFloat()
+            val zco = unpacker.unpackFloat()
+            val yaw = unpacker.unpackFloat()
+            return StartCapturePacket(pid, captureTime, xco, yco, zco, yaw)
         }
         return null
     }

@@ -24,15 +24,12 @@
             android:layout_height="48dp" />
     </LinearLayout>
 
-    <Button
-        android:id="@+id/createCampaignButton"
+    <ToggleButton
+        android:id="@+id/toggleCreateCloseCampaignButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/create_campaign" />
+        android:text="ToggleButton"
+        android:textOff="@string/create_campaign"
+        android:textOn="@string/close_campaign" />
 
-    <Button
-        android:id="@+id/closeCampaignButton"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/close_campaign" />
 </LinearLayout>

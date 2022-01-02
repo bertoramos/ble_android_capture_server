@@ -20,5 +20,6 @@
     <string name="db_name">DB name</string>
     <string name="db_not_created">DB not created</string>
     <string name="close_campaign">Close campaign</string>
+    <string name="campaign">Campaign</string>
 
 </resources>
