@@ -24,6 +24,8 @@ class DatabaseViewModel : ViewModel() {
 
     private lateinit var context: Context
 
+    fun isDatabaseCreated() : Boolean = databaseHelper != null
+
     fun createDatabase(context: Context, databaseName: String) {
         databaseHelper.value = CampaignDatabaseHelper(context, databaseName)
         this.context = context
