@@ -15,16 +15,14 @@ import android.view.ViewGroup
 import android.widget.ToggleButton
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.viewModels
-import androidx.lifecycle.Observer
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.ips.blecapturer.BLEScanner
 import com.ips.blecapturer.R
 import com.ips.blecapturer.model.BLESharedViewModel
+import com.ips.blecapturer.model.database.CampaignDatabaseHelper
 import com.ips.blecapturer.model.database.DatabaseHandler
-import com.ips.blecapturer.model.database.DatabaseViewModel
 import com.ips.blecapturer.view.BleDeviceAdapter
-import com.ips.blecapturer.view.activities.MainActivity
 
 class BleFragment : Fragment() {
 
@@ -79,9 +77,6 @@ class BleFragment : Fragment() {
 
     @RequiresApi(Build.VERSION_CODES.M)
     private fun scanButtonSetup(view: View) {
-
-        // TODO: Deshabilitar si hay una campaña activa
-        // TODO: Deshabilitar si se ha iniciado una campaña
         val scanButton = view.findViewById<ToggleButton>(R.id.toggleCaptureButton)
         scanButton.setOnClickListener {
             val locationPermissionGranted = activity!!.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
@@ -105,6 +100,16 @@ class BleFragment : Fragment() {
                 }
             } else BLEScanner.stopScanner()
         }
+
+        DatabaseHandler.databaseViewModel?.databaseHelper?.observe(this, { handler: CampaignDatabaseHelper? ->
+            if(handler != null) {
+                if(scanButton.isChecked) BLEScanner.stopScanner()
+
+                scanButton.isChecked = false
+                scanButton.isEnabled = false
+
+            } else scanButton.isEnabled = true
+        })
     }
 
     @RequiresApi(Build.VERSION_CODES.M)

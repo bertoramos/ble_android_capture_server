@@ -11,7 +11,7 @@ import com.ips.blecapturer.model.database.tables.Pose
 
 class DatabaseViewModel : ViewModel() {
 
-    private val databaseHelper by lazy {
+    val databaseHelper by lazy {
         MutableLiveData<CampaignDatabaseHelper>()
     }
     private val currentCaptureId by lazy {
@@ -24,7 +24,7 @@ class DatabaseViewModel : ViewModel() {
 
     private lateinit var context: Context
 
-    fun isDatabaseCreated() : Boolean = databaseHelper != null
+    fun isDatabaseCreated() : Boolean = databaseHelper.value != null
 
     fun createDatabase(context: Context, databaseName: String) {
         databaseHelper.value = CampaignDatabaseHelper(context, databaseName)
@@ -73,7 +73,7 @@ class DatabaseViewModel : ViewModel() {
 
         val newRowId = db_write?.insert(Capture.TABLE_NAME, null, values)
 
-        currentCaptureId.value = newRowId
+        currentCaptureId.postValue(newRowId)
 
         val rescode = if(newRowId != null) newRowId > 0 else false
         if(rescode) this.updateDatabaseFile()

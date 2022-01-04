@@ -35,6 +35,10 @@ object BLEScanner {
         beaconWhiteList.addBeacon(mac, protocol)
     }
 
+    fun getDeviceName() {
+        Log.d("BLUETOOTH_ADAPTER", btAdapter.name)
+    }
+
     fun denyBeacon(mac: String, protocol: Beacon.Protocol) {
         beaconWhiteList.removeBeacon(mac, protocol)
     }
@@ -57,6 +61,8 @@ object BLEScanner {
         btScanner = btAdapter.bluetoothLeScanner
 
         this.bleViewModel = bleViewModel
+
+        getDeviceName()
 
         return !btAdapter.isEnabled
     }
@@ -102,6 +108,7 @@ object BLEScanner {
             var beacon_type = Beacon.Protocol.OTHER
             val rssi = result?.rssi
             val txpower = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) result?.txPower ?: 0 else 0
+            val timestamp = Date().time
 
             // GET BEACON TYPE
             if(scanRecord != null)
@@ -116,14 +123,22 @@ object BLEScanner {
             }
 
             var allowed = false
-            if(deviceAddress != null) {
+
+            if(deviceAddress != null && rssi != null) {
                 val beacon = Beacon(deviceAddress)
                 beacon.name = deviceName
                 beacon.protocol = beacon_type
                 beacon.rssi = rssi
                 beacon.txpower = txpower
-                bleViewModel.addBeacon(beacon)
                 allowed = beaconWhiteList.filter(beacon)
+
+                if(beaconWhiteList.size() == 0) {
+                    bleViewModel.addBeacon(beacon)
+                    DatabaseHandler.databaseViewModel?.insertScan(timestamp, deviceAddress, beacon_type, rssi, txpower)
+                } else if(allowed) {
+                    bleViewModel.addBeacon(beacon)
+                    DatabaseHandler.databaseViewModel?.insertScan(timestamp, deviceAddress, beacon_type, rssi, txpower)
+                }
             }
 
             Log.d("BLEScan",
@@ -136,26 +151,6 @@ object BLEScanner {
                      "ALLOWED : $allowed"
             )
 
-            if(deviceAddress != null && rssi != null) {
-                val timestamp = Date().time
-                DatabaseHandler.databaseViewModel?.insertScan(timestamp, deviceAddress, beacon_type, rssi, txpower)
-            }
-            /*
-            fun randomID(): String = List(2) {
-                (('A'..'F') + ('0'..'9')).random()
-            }.joinToString("")
-
-            val mac =
-                "${randomID()}:${randomID()}:${randomID()}:${randomID()}:${randomID()}:${randomID()}"
-
-            val protocolIdx = Random.nextInt(Beacon.Protocol.values().size)
-            val protocol = Beacon.Protocol.values()[protocolIdx]
-
-            val rssi = Random.nextInt(-100, 0)
-            val timestamp = Date().time
-            database_view_model.insertFrame(timestamp, mac, protocol, rssi)
-            Toast.makeText(applicationContext, "Frame inserted", Toast.LENGTH_LONG).show()
-             */
         }
     }
 

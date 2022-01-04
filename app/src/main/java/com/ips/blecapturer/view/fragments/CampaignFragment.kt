@@ -63,7 +63,11 @@ class CampaignFragment : Fragment() {
                     toggleCampaignButton.isChecked = false
                     Toast.makeText(view.context, "Campaign not created", Toast.LENGTH_LONG).show()
                 }
-                b.show()
+                val dialog = b.create()
+                dialog.setCanceledOnTouchOutside(false)
+                dialog.setCancelable(false)
+                
+                dialog.show()
             } else {
                 DatabaseHandler.databaseViewModel?.closeDatabase()
                 Toast.makeText(view.context, "Campaign was closed", Toast.LENGTH_LONG).show()

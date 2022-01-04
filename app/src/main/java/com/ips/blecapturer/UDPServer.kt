@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ips.blecapturer.model.BLESharedViewModel
+import com.ips.blecapturer.model.database.DatabaseHandler
 import com.ips.blecapturer.model.database.DatabaseViewModel
 import com.ips.blecapturer.packets.ModePacket
 import com.ips.blecapturer.packets.Packet
@@ -169,9 +170,24 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
                 Log.d("CAPTURE_POS", "${startCapturePacket.x} ${startCapturePacket.y} ${startCapturePacket.z} ${startCapturePacket.yaw}")
                 bleViewModel.addPose(startCapturePacket.x, startCapturePacket.y, startCapturePacket.z, startCapturePacket.yaw)
 
-                BLEScanner.startScanner()
-                sleep(captureTime)
-                BLEScanner.stopScanner()
+                val db = DatabaseHandler.databaseViewModel?.databaseHelper?.value?.writableDatabase
+                Log.d("DBHANDLER", "$db ${db == null}")
+                if(db != null) {
+                    try {
+                        db.beginTransaction()
+
+                        BLEScanner.startScanner()
+                        sleep(captureTime)
+                        BLEScanner.stopScanner()
+
+                        db.setTransactionSuccessful()
+
+                    } catch(e: Exception) {
+                        e.printStackTrace()
+                    } finally {
+                        db.endTransaction()
+                    }
+                }
 
                 last_pid_sent += 1
                 val pid = last_pid_sent

@@ -40,10 +40,10 @@ class BLESharedViewModel : ViewModel() {
     }
 
     fun addPose(x: Float, y: Float, z: Float, yaw: Float) {
-        last_xco.value = x
-        last_yco.value = y
-        last_zco.value = z
-        last_yaw.value = yaw
+        last_xco.postValue(x)
+        last_yco.postValue(y)
+        last_zco.postValue(z)
+        last_yaw.postValue(yaw)
     }
 
     fun getXco(): Float? = last_xco.value
