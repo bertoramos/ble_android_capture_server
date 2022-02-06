@@ -6,10 +6,7 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ips.blecapturer.model.BLESharedViewModel
 import com.ips.blecapturer.model.database.DatabaseHandler
 import com.ips.blecapturer.model.database.DatabaseViewModel
-import com.ips.blecapturer.packets.ModePacket
-import com.ips.blecapturer.packets.Packet
-import com.ips.blecapturer.packets.StartCapturePacket
-import com.ips.blecapturer.packets.UDPUnpacker
+import com.ips.blecapturer.packets.*
 import java.lang.Exception
 import java.net.DatagramPacket
 import java.net.DatagramSocket
@@ -78,7 +75,7 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
     
     private fun checkStop(packet: ModePacket) {
         if(startMode) {
-            if(packet.mode == 0) {
+            if(packet.mode == ModePacket.DISCONNECT) {
                 Log.d("UDPSERVER", "ALL CLEARED")
                 clientAddr = null
                 startMode = false
@@ -91,7 +88,7 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
 
     private fun checkStart(packet: ModePacket, address: InetAddress) {
         if(!startMode) {
-            if(packet.mode == 1) {
+            if(packet.mode == ModePacket.CONNECT) {
                 clientAddr = address
                 startMode = true
             }
@@ -126,11 +123,11 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
                             if(packet.ptype == ModePacket.PTYPE) {
                                 Log.d("UDPSERVER", "Es un paquete de modo")
                                 checkStart(packet as ModePacket, addr)
-                                if(packet.ptype in ack_packet_types) sendAckPacket(packet, 0)
+                                if(packet.ptype in ack_packet_types) sendAckPacket(packet, AckPacket.STATUS_OK)
                                 checkStop(packet)
                             } else {
                                 buffer.add(packet)
-                                if(packet.ptype in ack_packet_types) sendAckPacket(packet, 0)
+                                if(packet.ptype in ack_packet_types) sendAckPacket(packet, AckPacket.STATUS_OK)
                                 checkRecvPacket(packet)
                             }
 

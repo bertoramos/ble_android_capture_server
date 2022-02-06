@@ -4,6 +4,9 @@ class ModePacket(pid: Long, val mode: Int) : Packet(pid, ModePacket.PTYPE) {
 
     companion object {
         val PTYPE = 2
+
+        val CONNECT = 1
+        val DISCONNECT = 0
     }
 
     override fun toString(): String {

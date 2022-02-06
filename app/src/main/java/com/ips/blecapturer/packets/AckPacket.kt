@@ -4,6 +4,8 @@ class AckPacket(pid: Long, val ackPid: Long, val status: Int) : Packet(pid, AckP
 
     companion object {
         val PTYPE = 1
+
+        val STATUS_OK = 0
     }
 
     override fun toString(): String {

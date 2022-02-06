@@ -98,6 +98,7 @@ object BLEScanner {
         }
 
 
+        @RequiresApi(Build.VERSION_CODES.O)
         override fun onScanResult(callbackType: Int, result: ScanResult?) {
             super.onScanResult(callbackType, result)
             val device = result?.device
@@ -140,6 +141,8 @@ object BLEScanner {
                     DatabaseHandler.databaseViewModel?.insertScan(timestamp, deviceAddress, beacon_type, rssi, txpower)
                 }
             }
+
+            val freq = result?.periodicAdvertisingInterval
 
             Log.d("BLEScan",
                 "Name : $deviceName " +
