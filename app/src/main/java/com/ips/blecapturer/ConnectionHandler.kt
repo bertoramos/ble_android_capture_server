@@ -2,6 +2,7 @@ package com.ips.blecapturer
 
 
 import android.util.Log
+import android.view.View
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ips.blecapturer.model.BLESharedViewModel
 import com.ips.blecapturer.packets.*
@@ -21,6 +22,12 @@ object ConnectionHandler {
     fun setBLESharedViewModel(viewModel: BLESharedViewModel) {
         if(server != null) {
             server!!.setBLESharedViewModel(viewModel)
+        }
+    }
+
+    fun setView(view: View) {
+        if(server != null) {
+            server!!.setView(view)
         }
     }
 

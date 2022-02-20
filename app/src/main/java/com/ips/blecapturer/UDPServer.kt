@@ -1,6 +1,8 @@
 package com.ips.blecapturer
 
 import android.util.Log
+import android.view.View
+import android.widget.TextView
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ips.blecapturer.model.BLESharedViewModel
@@ -33,9 +35,14 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
     var buffer: ArrayList<Packet> = ArrayList()
 
     private lateinit var bleViewModel: BLESharedViewModel
+    private lateinit var view: View
 
     fun setBLESharedViewModel(bleViewModel: BLESharedViewModel) {
         this.bleViewModel = bleViewModel
+    }
+
+    fun setView(v: View) {
+        view = v
     }
 
     fun closeSocket() {
@@ -82,6 +89,8 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
 
                 last_pid_recv = 0L
                 last_pid_sent = 0L
+
+                view?.findViewById<TextView>(R.id.clientIPTextView)?.text = "Client disconnected"
             }
         }
     }
@@ -91,6 +100,8 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
             if(packet.mode == ModePacket.CONNECT) {
                 clientAddr = address
                 startMode = true
+
+                view?.findViewById<TextView>(R.id.clientIPTextView)?.text = "Client: ${clientAddr?.hostAddress}"
             }
         }
     }

@@ -51,17 +51,18 @@ class ServerFragment : Fragment() {
 
         ConnectionHandler.connect(clientPort, serverPort)
         ConnectionHandler.setBLESharedViewModel(bleViewModel)
+        view?.let { ConnectionHandler.setView(it) }
 
         val context: Context = requireContext().applicationContext
         val wm: WifiManager = context.getSystemService(Context.WIFI_SERVICE) as WifiManager
         val ip = Formatter.formatIpAddress(wm.connectionInfo.ipAddress)
         Log.d("BLECapturer" , "My ip: $ip")
-        view?.findViewById<TextView>(R.id.serverNameTextView)?.text = "Server\nIP: $ip"
+        view?.findViewById<TextView>(R.id.serverIPTextView)?.text = "Server IP: $ip"
     }
 
     private fun offServer() {
         ConnectionHandler.disconnect()
-        view?.findViewById<TextView>(R.id.serverNameTextView)?.text = "Server"
+        view?.findViewById<TextView>(R.id.serverIPTextView)?.text = ""
     }
 
 }
