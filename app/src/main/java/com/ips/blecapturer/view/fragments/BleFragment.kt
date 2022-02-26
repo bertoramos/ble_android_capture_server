@@ -12,6 +12,7 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Button
 import android.widget.ToggleButton
 import androidx.annotation.RequiresApi
 import androidx.fragment.app.viewModels
@@ -23,6 +24,7 @@ import com.ips.blecapturer.model.BLESharedViewModel
 import com.ips.blecapturer.model.database.CampaignDatabaseHelper
 import com.ips.blecapturer.model.database.DatabaseHandler
 import com.ips.blecapturer.view.BleDeviceAdapter
+import com.ips.blecapturer.view.activities.WhiteListActivity
 
 class BleFragment : Fragment() {
 
@@ -55,6 +57,8 @@ class BleFragment : Fragment() {
 
         return inflaterView
     }
+
+
 
     private fun bleDevicesList(view: View) {
         val beaconsList: RecyclerView = view.findViewById(R.id.ble_devices_list)
