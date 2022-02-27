@@ -2,7 +2,7 @@
     <string name="app_name">BLECapturer</string>
     <string name="server">Server</string>
     <string name="serverIP"></string>
-    <string name="clientIP">Client disconnected</string>
+    <string name="clientIP"></string>
     <string name="capture_ble">BLE Capture</string>
 
     <string name="mac">MAC</string>
@@ -23,5 +23,6 @@
     <string name="db_not_created">DB not created</string>
     <string name="close_campaign">Close campaign</string>
     <string name="campaign">Campaign</string>
-
+    <string name="off_mini">OFF</string>
+    <string name="on_mini">ON</string>
 </resources>

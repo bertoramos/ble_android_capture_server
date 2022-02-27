@@ -13,6 +13,59 @@
         android:orientation="vertical">
 
         <LinearLayout
+            android:id="@+id/serverLayout"
+            android:layout_width="match_parent"
+            android:layout_height="168dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/serverButton"
+                android:layout_width="wrap_content"
+                android:layout_height="65dp"
+                android:text="@string/off_mini"
+                app:cornerRadius="30dp"
+                app:icon="@drawable/ic_power_off_24dp_foreground" />
+
+            <TextView
+                android:id="@+id/serverIPTextView"
+                android:layout_width="151dp"
+                android:layout_height="wrap_content"
+                android:text="@string/serverIP" />
+
+            <TextView
+                android:id="@+id/clientIPTextView"
+                android:layout_width="151dp"
+                android:layout_height="wrap_content"
+                android:text="@string/clientIP" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/DBLayout"
+            android:layout_width="match_parent"
+            android:layout_height="95dp"
+            android:layout_marginStart="0dp"
+            android:layout_marginTop="0dp"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/createCampaignButton"
+                style="@style/Widget.MaterialComponents.Button.OutlinedButton.Icon"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:gravity="center"
+                android:text="@string/create_campaign"
+                app:cornerRadius="20dp"
+                app:icon="@drawable/ic_add_24dp_foreground" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/white_list_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical">
@@ -27,77 +80,6 @@
 
         </LinearLayout>
 
-        <LinearLayout
-            android:id="@+id/linearLayout2"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/serverNameTextView"
-                android:layout_width="151dp"
-                android:layout_height="wrap_content"
-                android:text="@string/server" />
-
-            <TextView
-                android:id="@+id/serverIPTextView"
-                android:layout_width="151dp"
-                android:layout_height="wrap_content"
-                android:text="@string/serverIP" />
-
-            <TextView
-                android:id="@+id/clientIPTextView"
-                android:layout_width="151dp"
-                android:layout_height="wrap_content"
-                android:text="@string/clientIP" />
-
-            <ToggleButton
-                android:id="@+id/toggleServerButton"
-                android:layout_width="203dp"
-                android:layout_height="38dp"
-                android:layout_weight="1"
-                android:text="ToggleButton" />
-
-        </LinearLayout>
-
-        <LinearLayout
-            android:id="@+id/linearLayout"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_marginStart="0dp"
-            android:layout_marginTop="0dp"
-            android:orientation="vertical">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="horizontal">
-
-                <TextView
-                    android:id="@+id/databaseNameLabel"
-                    android:layout_width="wrap_content"
-                    android:layout_height="match_parent"
-                    android:layout_weight="1"
-                    android:text="@string/db_not_created" />
-
-                <TextView
-                    android:id="@+id/currentDatabaseName"
-                    android:layout_width="194dp"
-                    android:layout_height="48dp" />
-            </LinearLayout>
-
-            <ToggleButton
-                android:id="@+id/toggleCreateCloseCampaignButton"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="ToggleButton"
-                android:textOff="@string/create_campaign"
-                android:textOn="@string/close_campaign" />
-
-        </LinearLayout>
     </LinearLayout>
 
 </FrameLayout>

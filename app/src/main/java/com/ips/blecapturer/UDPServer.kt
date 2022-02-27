@@ -90,7 +90,7 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
                 last_pid_recv = 0L
                 last_pid_sent = 0L
 
-                view?.findViewById<TextView>(R.id.clientIPTextView)?.text = "Client disconnected"
+                view?.findViewById<TextView>(R.id.clientIPTextView)?.text = ""
             }
         }
     }

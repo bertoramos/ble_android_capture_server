@@ -8,27 +8,29 @@ import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Button
 import android.widget.ToggleButton
 import androidx.annotation.RequiresApi
+import androidx.core.content.ContextCompat
+import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
+import com.google.android.material.floatingactionbutton.FloatingActionButton
 import com.ips.blecapturer.BLEScanner
 import com.ips.blecapturer.R
 import com.ips.blecapturer.model.BLESharedViewModel
 import com.ips.blecapturer.model.database.CampaignDatabaseHelper
 import com.ips.blecapturer.model.database.DatabaseHandler
 import com.ips.blecapturer.view.BleDeviceAdapter
-import com.ips.blecapturer.view.activities.WhiteListActivity
+
 
 class BleFragment : Fragment() {
 
     private val ble_model : BLESharedViewModel by viewModels()
+    private var scan_flag_button = false
 
     companion object {
         private const val REQUEST_ENABLE_BT = 1
@@ -79,15 +81,31 @@ class BleFragment : Fragment() {
 
     }
 
+    private fun scanButton(view: View)
+    {
+        var fab: FloatingActionButton = view.findViewById(R.id.scan_button)
+        fab.setOnClickListener {
+            if(scan_flag_button) {
+                fab.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_search_off_24dp_foreground))
+                scan_flag_button = false
+            } else {
+                fab.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_search_foreground_24dp))
+                scan_flag_button = true
+            }
+        }
+    }
+
     @RequiresApi(Build.VERSION_CODES.M)
     private fun scanButtonSetup(view: View) {
-        val scanButton = view.findViewById<ToggleButton>(R.id.toggleCaptureButton)
+        val scanButton = view.findViewById<FloatingActionButton>(R.id.scan_button)
         scanButton.setOnClickListener {
             val locationPermissionGranted = activity!!.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
             val bleActive = BLEScanner.isEnabled()
-            if(scanButton.isChecked) {
+            if(!scan_flag_button) {
                 if(locationPermissionGranted && bleActive) {
                     BLEScanner.startScanner()
+                    scan_flag_button = true
+                    scanButton.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_search_foreground_24dp))
                 } else {
                     val builder = AlertDialog.Builder(context)
                     builder.setTitle("This app requires bluetooth")
@@ -100,17 +118,22 @@ class BleFragment : Fragment() {
                         )
                     }
                     builder.show()
-                    scanButton.isChecked = false
+                    //scanButton.isChecked = false
                 }
-            } else BLEScanner.stopScanner()
+            } else {
+                BLEScanner.stopScanner()
+                scan_flag_button = false
+                scanButton.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_search_off_24dp_foreground))
+            }
         }
 
         DatabaseHandler.databaseViewModel?.databaseHelper?.observe(this, { handler: CampaignDatabaseHelper? ->
             if(handler != null) {
-                if(scanButton.isChecked) BLEScanner.stopScanner()
+                if(scan_flag_button) BLEScanner.stopScanner()
 
-                scanButton.isChecked = false
+                scan_flag_button = false
                 scanButton.isEnabled = false
+                scanButton.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_search_off_24dp_foreground))
 
             } else scanButton.isEnabled = true
         })
