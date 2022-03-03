@@ -13,15 +13,19 @@ import com.ips.blecapturer.view.fragments.ServerFragment
 
 class MainActivity : AppCompatActivity() {
 
-    val server_fragment = ServerFragment()
-    val scanner_fragment = BleFragment()
-    val fm = supportFragmentManager
+    private lateinit var server_fragment: ServerFragment
+    private lateinit var scanner_fragment: BleFragment
+    var fm = supportFragmentManager
 
-    var active: Fragment = scanner_fragment
+    private lateinit var active: Fragment
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        server_fragment = ServerFragment()
+        scanner_fragment = BleFragment()
+        active = scanner_fragment
 
         fm.beginTransaction().add(R.id.fragmentContainerView, server_fragment, "2").hide(server_fragment).commit()
         fm.beginTransaction().add(R.id.fragmentContainerView, scanner_fragment, "1").commit()

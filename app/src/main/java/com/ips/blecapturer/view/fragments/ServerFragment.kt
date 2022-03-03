@@ -1,5 +1,6 @@
 package com.ips.blecapturer.view.fragments
 
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.net.wifi.WifiManager
@@ -56,16 +57,34 @@ class ServerFragment : Fragment() {
 
         val serverButton = inflateView.findViewById<MaterialButton>(R.id.serverButton)
         serverButton.setOnClickListener {
-            serverState = if(serverState) {
-                offServer()
-                serverButton.icon = ContextCompat.getDrawable(inflateView.context, R.drawable.ic_power_off_24dp_foreground)
-                serverButton.text = resources.getText(R.string.off_mini)
-                false
+            if(!BLEScanner.isEnabled()) {
+                val builder = android.app.AlertDialog.Builder(context)
+                builder.setTitle("This app requires bluetooth")
+                builder.setMessage("Please activate bluetooth")
+                builder.setPositiveButton(android.R.string.ok, null)
+                builder.setOnDismissListener {
+
+                }
+                builder.show()
             } else {
-                onServer()
-                serverButton.icon = ContextCompat.getDrawable(inflateView.context, R.drawable.ic_power_24dp_foreground)
-                serverButton.text = resources.getText(R.string.on_mini)
-                true
+                serverState = if (serverState) {
+                    offServer()
+                    serverButton.icon = ContextCompat.getDrawable(
+                        inflateView.context,
+                        R.drawable.ic_power_off_24dp_foreground
+                    )
+                    serverButton.text = resources.getText(R.string.off_mini)
+                    false
+                } else {
+                    onServer()
+                    serverButton.icon = ContextCompat.getDrawable(
+                        inflateView.context,
+                        R.drawable.ic_power_24dp_foreground
+                    )
+                    serverButton.text = resources.getText(R.string.on_mini)
+                    true
+                }
+
             }
         }
 

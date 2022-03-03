@@ -58,13 +58,14 @@ object BLEScanner {
     {
         btManager = context.getSystemService(Context.BLUETOOTH_SERVICE) as BluetoothManager
         btAdapter = btManager.adapter
+        if(btAdapter.bluetoothLeScanner == null) return false
         btScanner = btAdapter.bluetoothLeScanner
 
         this.bleViewModel = bleViewModel
 
         getDeviceName()
 
-        return !btAdapter.isEnabled
+        return btAdapter.isEnabled
     }
 
     fun isEnabled() : Boolean {

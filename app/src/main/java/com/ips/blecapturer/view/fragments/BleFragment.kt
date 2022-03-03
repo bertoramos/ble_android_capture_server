@@ -1,6 +1,7 @@
 package com.ips.blecapturer.view.fragments
 
 import android.Manifest
+import android.app.Activity
 import android.app.AlertDialog
 import android.bluetooth.BluetoothAdapter
 import android.content.Intent
@@ -34,7 +35,7 @@ class BleFragment : Fragment() {
 
     companion object {
         private const val REQUEST_ENABLE_BT = 1
-        private const val PERMISSION_REQUEST_COARSE_LOCATION = 1
+        private const val PERMISSION_REQUEST_COARSE_LOCATION = 2
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,8 +49,12 @@ class BleFragment : Fragment() {
     ): View? {
         val inflaterView = inflater.inflate(R.layout.fragment_ble, container, false)
 
-        if( BLEScanner.setupBLEManager(context!!, ble_model) )
-            startActivityForResult(Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE), REQUEST_ENABLE_BT)
+        if( !BLEScanner.setupBLEManager(context!!, ble_model) ) {
+            startActivityForResult(
+                Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE),
+                REQUEST_ENABLE_BT
+            )
+        }
 
         checkLocationPermissions()
 
@@ -60,7 +65,16 @@ class BleFragment : Fragment() {
         return inflaterView
     }
 
+    @RequiresApi(Build.VERSION_CODES.M)
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == REQUEST_ENABLE_BT) {
+            if(resultCode == Activity.RESULT_OK) {
+                BLEScanner.setupBLEManager(context!!, ble_model)
 
+            }
+        }
+    }
 
     private fun bleDevicesList(view: View) {
         val beaconsList: RecyclerView = view.findViewById(R.id.ble_devices_list)
@@ -81,20 +95,6 @@ class BleFragment : Fragment() {
 
     }
 
-    private fun scanButton(view: View)
-    {
-        var fab: FloatingActionButton = view.findViewById(R.id.scan_button)
-        fab.setOnClickListener {
-            if(scan_flag_button) {
-                fab.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_search_off_24dp_foreground))
-                scan_flag_button = false
-            } else {
-                fab.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_search_foreground_24dp))
-                scan_flag_button = true
-            }
-        }
-    }
-
     @RequiresApi(Build.VERSION_CODES.M)
     private fun scanButtonSetup(view: View) {
         val scanButton = view.findViewById<FloatingActionButton>(R.id.scan_button)
@@ -112,10 +112,7 @@ class BleFragment : Fragment() {
                     builder.setMessage("Please activate bluetooth")
                     builder.setPositiveButton(android.R.string.ok, null)
                     builder.setOnDismissListener {
-                        requestPermissions(
-                            arrayOf(Manifest.permission.ACCESS_COARSE_LOCATION),
-                            PERMISSION_REQUEST_COARSE_LOCATION
-                        )
+                        
                     }
                     builder.show()
                     //scanButton.isChecked = false
