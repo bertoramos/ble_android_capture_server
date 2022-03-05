@@ -156,7 +156,7 @@ class ServerFragment : Fragment() {
         val toggleCampaignButton = view.findViewById<MaterialButton>(R.id.createCampaignButton)
 
         campaignCreated = false
-        view.findViewById<MaterialButton>(R.id.serverButton).isEnabled = false
+        //view.findViewById<MaterialButton>(R.id.serverButton).isEnabled = false
 
         toggleCampaignButton.icon = ContextCompat.getDrawable(view.context, R.drawable.ic_add_24dp_foreground)
         toggleCampaignButton.text = resources.getText(R.string.create_campaign)
