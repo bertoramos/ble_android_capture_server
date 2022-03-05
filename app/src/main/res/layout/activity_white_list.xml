@@ -16,6 +16,15 @@
         android:textAllCaps="false"
         android:textAppearance="@style/TextAppearance.AppCompat.Large" />
 
+    <TextView
+        android:id="@+id/all_allowed_label"
+        android:layout_width="match_parent"
+        android:layout_height="42dp"
+        android:layout_marginTop="15dp"
+        android:text="@string/all_beacon_allowed"
+        android:textAlignment="center"
+        android:textSize="20sp" />
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/whiteListRecyclerView"
         android:layout_width="412dp"

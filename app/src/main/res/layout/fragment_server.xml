@@ -68,15 +68,18 @@
             android:id="@+id/white_list_layout"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:gravity="center">
 
             <Button
                 android:id="@+id/whiteListButton"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_width="299dp"
+                android:layout_height="65dp"
                 android:layout_marginStart="0dp"
                 android:layout_marginTop="0dp"
-                android:text="@string/white_list" />
+                android:text="@string/white_list"
+                android:textAlignment="center"
+                />
 
         </LinearLayout>
 

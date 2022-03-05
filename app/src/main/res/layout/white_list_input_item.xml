@@ -9,14 +9,16 @@
     <br.com.sapereaude.maskedEditText.MaskedEditText
         android:id="@+id/macInputFilter"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="58dp"
         android:hint="000000000000"
-        mask:allowed_chars="0123456789ABCDEF"
+        android:inputType="textVisiblePassword"
+        mask:allowed_chars="0123456789ABCDEFabcdef"
         mask:mask="##:##:##:##:##:##" />
 
     <Spinner
         android:id="@+id/protocolSpinner"
         android:layout_width="match_parent"
-        android:layout_height="40dp"
-        android:spinnerMode="dropdown" />
+        android:layout_height="60dp"
+        android:spinnerMode="dropdown"
+        />
 </LinearLayout>

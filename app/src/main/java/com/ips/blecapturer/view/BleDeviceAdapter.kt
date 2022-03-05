@@ -35,7 +35,7 @@ class BleDeviceAdapter : RecyclerView.Adapter<BleDeviceAdapter.BleDeviceHolder>(
         fun bind(beacon: Beacon) {
             mac.text = beacon.mac
             protocol.text = beacon.protocol.toString()
-            rssi.text = "${beacon.rssi} dBm"
+            rssi.text = beacon.rssi.toString()
         }
     }
 }

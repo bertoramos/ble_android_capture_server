@@ -11,6 +11,7 @@
     <string name="filter">Filter</string>
     <string name="white_list">White list</string>
     <string name="add">Add</string>
+    <string name="all_beacon_allowed">All beacons allowed</string>
 
     <string-array name="protocols">
         <item>Eddystone</item>

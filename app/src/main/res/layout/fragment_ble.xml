@@ -14,7 +14,9 @@
 
         <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
-            android:layout_height="27dp">
+            android:layout_height="27dp"
+            android:visibility="gone"
+            tools:visibility="gone">
 
             <TextView
                 android:id="@+id/macLabelHeader"
@@ -47,7 +49,7 @@
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/ble_devices_list"
             android:layout_width="match_parent"
-            android:layout_height="151dp"
+            android:layout_height="wrap_content"
             tools:listitem="@layout/ble_device_item" />
 
     </LinearLayout>
