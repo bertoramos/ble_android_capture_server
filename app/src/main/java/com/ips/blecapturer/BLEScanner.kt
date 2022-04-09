@@ -16,6 +16,7 @@ import com.ips.blecapturer.model.BeaconWhiteList
 import com.ips.blecapturer.model.database.DatabaseHandler
 import com.ips.blecapturer.model.database.tables.Pose
 import java.util.*
+import kotlin.collections.ArrayList
 
 // Inspiration:
 //  https://medium.com/@nithinjith.p/ble-in-android-kotlin-c485f0e83c16
@@ -30,6 +31,10 @@ object BLEScanner {
     private lateinit var bleViewModel: BLESharedViewModel
 
     private var beaconWhiteList: BeaconWhiteList = BeaconWhiteList()
+
+    fun getBeaconList(): ArrayList<Pair<String, Beacon.Protocol>> {
+        return beaconWhiteList.beaconWhiteList
+    }
 
     fun allowBeacon(mac: String, protocol: Beacon.Protocol) {
         beaconWhiteList.addBeacon(mac, protocol)
@@ -53,6 +58,10 @@ object BLEScanner {
 
     fun getWhiteListSize(): Int = beaconWhiteList.size()
 
+    fun whiteListContains(mac: String, protocol: Beacon.Protocol): Boolean {
+        return beaconWhiteList.contains(mac, protocol)
+    }
+
     @RequiresApi(Build.VERSION_CODES.M)
     fun setupBLEManager(context: Context, bleViewModel: BLESharedViewModel) : Boolean
     {
@@ -72,14 +81,18 @@ object BLEScanner {
         return btAdapter.isEnabled
     }
 
-    fun startScanner()
+    fun startScanner(x: Float, y: Float, z: Float, yaw: Float)
     {
         btScanner.startScan(leScanCallback)
 
+        /*
         val x = bleViewModel.getXco() ?: 0.0f
         val y = bleViewModel.getYco() ?: 0.0f
         val z = bleViewModel.getZco() ?: 0.0f
         val yaw = bleViewModel.getYaw() ?: 0.0f
+        */
+
+        Log.d("START_SCANNER", "$x $y $z  $bleViewModel")
 
         val pos = Pose(x, y, z, yaw)
         val timestamp = Date().time
@@ -134,11 +147,11 @@ object BLEScanner {
                 beacon.txpower = txpower
                 allowed = beaconWhiteList.filter(beacon)
 
+                bleViewModel.addBeacon(beacon)
+
                 if(beaconWhiteList.size() == 0) {
-                    bleViewModel.addBeacon(beacon)
                     DatabaseHandler.databaseViewModel?.insertScan(timestamp, deviceAddress, beacon_type, rssi, txpower)
                 } else if(allowed) {
-                    bleViewModel.addBeacon(beacon)
                     DatabaseHandler.databaseViewModel?.insertScan(timestamp, deviceAddress, beacon_type, rssi, txpower)
                 }
             }

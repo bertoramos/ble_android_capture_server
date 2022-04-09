@@ -20,6 +20,7 @@ object UDPUnpacker {
                 ModePacket.PTYPE -> unpackModePacket(pid, ptype, unpacker, len)
                 StartCapturePacket.PTYPE -> unpackStartCapturePacket(pid, ptype, unpacker, len)
                 EndCapturePacket.PTYPE -> unpackEndCapturePacket(pid, ptype, unpacker, len)
+                CloseServerPacket.PTYPE -> unpackCloseServerPacket(pid, ptype, unpacker, len)
                 else -> null
             }
 
@@ -63,4 +64,10 @@ object UDPUnpacker {
         return null
     }
 
+    private fun unpackCloseServerPacket(pid: Long, ptype: Int, unpacker: MessageUnpacker, size: Int): CloseServerPacket? {
+        if(size == 2) {
+            return CloseServerPacket(pid)
+        }
+        return null
+    }
 }

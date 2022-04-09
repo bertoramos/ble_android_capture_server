@@ -78,4 +78,28 @@ object ConnectionHandler {
         return false
     }
 
+    fun sendServerClosePacket(): Boolean {
+
+        if(server != null) {
+            if(server!!.clientAddr != null) {
+                server!!.last_pid_sent += 1
+                val pid = server!!.last_pid_sent
+
+                val packet = CloseServerPacket(pid)
+                val bytes = UDPPacker.pack(packet)
+
+                if(bytes != null) server!!.sendPacket(bytes)
+
+                val currentTime = System.currentTimeMillis()
+                while (abs(System.currentTimeMillis() - currentTime) < 8000) {
+                    if (wasAck(packet.pid)) return true
+                }
+
+                //Log.d("SERVER", "CLIENT CONNECTED")
+            }
+        }
+
+        return false
+    }
+
 }

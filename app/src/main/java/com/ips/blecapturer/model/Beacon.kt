@@ -14,8 +14,17 @@ data class Beacon(var mac: String) {
                 EDDYSTONE -> "Eddystone"
             }
         }
+        companion object {
+            fun fromString(protocol: String): Protocol? {
+                return when (protocol) {
+                    "Other" -> OTHER
+                    "iBeacon" -> IBEACON
+                    "Eddystone" -> EDDYSTONE
+                    else -> null
+                }
+            }
+        }
     }
-
 
     var name: String? = null
     var protocol: Protocol = Protocol.OTHER

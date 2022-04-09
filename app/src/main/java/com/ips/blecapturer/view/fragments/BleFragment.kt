@@ -12,7 +12,6 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ToggleButton
 import androidx.annotation.RequiresApi
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
@@ -71,7 +70,6 @@ class BleFragment : Fragment() {
         if(requestCode == REQUEST_ENABLE_BT) {
             if(resultCode == Activity.RESULT_OK) {
                 BLEScanner.setupBLEManager(context!!, ble_model)
-
             }
         }
     }
@@ -103,7 +101,7 @@ class BleFragment : Fragment() {
             val bleActive = BLEScanner.isEnabled()
             if(!scan_flag_button) {
                 if(locationPermissionGranted && bleActive) {
-                    BLEScanner.startScanner()
+                    BLEScanner.startScanner(0F, 0F, 0F, 0F)
                     scan_flag_button = true
                     scanButton.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_search_foreground_24dp))
                 } else {

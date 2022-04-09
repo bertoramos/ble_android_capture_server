@@ -14,6 +14,7 @@ object UDPPacker {
             ModePacket.PTYPE -> packModePacket(packet as ModePacket)
             StartCapturePacket.PTYPE -> packStartPacket(packet as StartCapturePacket)
             EndCapturePacket.PTYPE -> packEndPacket(packet as EndCapturePacket)
+            CloseServerPacket.PTYPE -> packCloseServerPacket(packet as CloseServerPacket)
             else -> null
         }
     }
@@ -71,4 +72,12 @@ object UDPPacker {
         return packer.toByteArray()
     }
 
+    fun packCloseServerPacket(packet: CloseServerPacket): ByteArray {
+        val packer = MessagePack.newDefaultBufferPacker()
+        packer
+            .packArrayHeader(2)
+            .packLong(packet.pid)
+            .packInt(packet.ptype)
+        return packer.toByteArray()
+    }
 }

@@ -28,12 +28,32 @@
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/whiteListRecyclerView"
         android:layout_width="412dp"
-        android:layout_height="386dp" />
+        android:layout_height="210dp" />
 
     <Button
         android:id="@+id/addFilterButton"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/add" />
+    <Button
+        android:id="@+id/clearWhiteList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/clear" />
+
+    <Space
+        android:layout_width="match_parent"
+        android:layout_height="29dp" />
+
+    <Button
+        android:id="@+id/saveWhiteList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/save" />
+    <Button
+        android:id="@+id/loadWhiteList"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="@string/load" />
 
 </LinearLayout>

@@ -24,6 +24,7 @@ import com.ips.blecapturer.model.BLESharedViewModel
 import com.ips.blecapturer.model.database.DatabaseHandler
 import com.ips.blecapturer.model.database.DatabaseViewModel
 import com.ips.blecapturer.view.activities.WhiteListActivity
+import kotlin.concurrent.thread
 
 
 class ServerFragment : Fragment() {
@@ -123,10 +124,14 @@ class ServerFragment : Fragment() {
     }
 
     private fun offServer() {
-        ConnectionHandler.disconnect()
-        view?.findViewById<TextView>(R.id.serverIPTextView)?.text = ""
-    }
+        thread (start = true) {
+            ConnectionHandler.sendServerClosePacket()
 
+            ConnectionHandler.disconnect()
+            view?.findViewById<TextView>(R.id.serverIPTextView)?.text = ""
+            view?.findViewById<TextView>(R.id.clientIPTextView)?.text = ""
+        }
+    }
 
     private fun create_campaign(view: View, dbname: String) {
         val toggleCampaignButton = view.findViewById<MaterialButton>(R.id.createCampaignButton)

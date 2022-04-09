@@ -6,6 +6,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
+import androidx.core.view.forEach
 import androidx.recyclerview.widget.RecyclerView
 import com.ips.blecapturer.BLEScanner
 import com.ips.blecapturer.R

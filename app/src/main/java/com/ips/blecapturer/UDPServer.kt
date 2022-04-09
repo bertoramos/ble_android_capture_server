@@ -3,11 +3,8 @@ package com.ips.blecapturer
 import android.util.Log
 import android.view.View
 import android.widget.TextView
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.viewmodel.compose.viewModel
 import com.ips.blecapturer.model.BLESharedViewModel
 import com.ips.blecapturer.model.database.DatabaseHandler
-import com.ips.blecapturer.model.database.DatabaseViewModel
 import com.ips.blecapturer.packets.*
 import java.lang.Exception
 import java.net.DatagramPacket
@@ -177,14 +174,14 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
 
                 Log.d("CAPTURE_POS", "${startCapturePacket.x} ${startCapturePacket.y} ${startCapturePacket.z} ${startCapturePacket.yaw}")
                 bleViewModel.addPose(startCapturePacket.x, startCapturePacket.y, startCapturePacket.z, startCapturePacket.yaw)
-
+                Log.d("CAPTURE_POS", "X: ${bleViewModel.getXco()} Y: ${bleViewModel.getYco()} Z: ${bleViewModel.getZco()} YAW: ${bleViewModel.getYaw()}")
                 val db = DatabaseHandler.databaseViewModel?.databaseHelper?.value?.writableDatabase
                 Log.d("DBHANDLER", "$db ${db == null}")
                 if(db != null) {
                     try {
                         db.beginTransaction()
 
-                        BLEScanner.startScanner()
+                        BLEScanner.startScanner(startCapturePacket.x, startCapturePacket.y, startCapturePacket.z, startCapturePacket.yaw)
                         sleep(captureTime)
                         BLEScanner.stopScanner()
 

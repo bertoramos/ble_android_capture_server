@@ -1,7 +1,8 @@
 package com.ips.blecapturer.view.activities
 
+import android.content.Intent
 import android.os.Bundle
-import android.transition.Visibility
+import android.util.Log
 import android.view.View
 import android.widget.*
 import androidx.appcompat.app.AlertDialog
@@ -14,18 +15,26 @@ import com.ips.blecapturer.BLEScanner
 import com.ips.blecapturer.R
 import com.ips.blecapturer.model.Beacon
 import com.ips.blecapturer.view.WhiteListAdapter
-import java.util.*
+import java.io.InputStream
+import java.io.OutputStream
 
 
 class WhiteListActivity : AppCompatActivity() {
 
     private lateinit var whiteListAdapter: WhiteListAdapter
 
+    companion object {
+        var REQUEST_CREATE_FILE = 1
+        var REQUEST_OPEN_FILE = 2
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_white_list)
 
         whiteList()
+
+        checkWhiteListEmpty()
 
         findViewById<Button>(R.id.addFilterButton).setOnClickListener {
             addFilterAlertDialog()
@@ -39,6 +48,10 @@ class WhiteListActivity : AppCompatActivity() {
                 checkWhiteListEmpty()
             }
         })
+
+        clearWhiteListButton()
+        saveWhitelistButton()
+        loadWhitelistButton()
     }
 
     private fun checkWhiteListEmpty() {
@@ -84,5 +97,94 @@ class WhiteListActivity : AppCompatActivity() {
         whiteList.layoutManager = LinearLayoutManager(applicationContext)
 
         whiteListAdapter = adapter
+    }
+
+    private fun clearWhiteListButton() {
+        findViewById<Button>(R.id.clearWhiteList).setOnClickListener {
+            BLEScanner.allowAllBeacons()
+            whiteListAdapter.notifyDataSetChanged()
+        }
+    }
+
+    private fun saveWhitelistButton() {
+        findViewById<Button>(R.id.saveWhiteList).setOnClickListener {
+            val intent = Intent(Intent.ACTION_CREATE_DOCUMENT)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.setType("*text/plain")
+            intent.putExtra(Intent.EXTRA_TITLE, "file.conf")
+            startActivityForResult(intent, REQUEST_CREATE_FILE)
+        }
+    }
+
+    private fun loadWhitelistButton() {
+        findViewById<Button>(R.id.loadWhiteList).setOnClickListener {
+            val intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+            intent.addCategory(Intent.CATEGORY_OPENABLE)
+            intent.type = "*/*"
+
+            startActivityForResult(intent, REQUEST_OPEN_FILE)
+        }
+    }
+
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
+        super.onActivityResult(requestCode, resultCode, data)
+        if(requestCode == REQUEST_CREATE_FILE) {
+            Log.d("REQUEST", "${data?.data}")
+            var os : OutputStream? = null
+            if (data != null) {
+                os = contentResolver.openOutputStream(data.data!!)
+
+                val whitelist = BLEScanner.getBeaconList()
+
+                var content = ""
+                whitelist.forEach { el ->
+                    val mac: String = el.first
+                    val protocol: Beacon.Protocol = el.second
+                    content += "$mac $protocol\n"
+                }
+                val bt = content.toByteArray()
+                os?.write(bt)
+            }
+            os?.close()
+        }
+
+        val errorRead = Toast.makeText(applicationContext, "Not valid format", Toast.LENGTH_LONG)
+
+        if(requestCode == REQUEST_OPEN_FILE) {
+            val tmpWhiteList = arrayListOf<Pair<String, Beacon.Protocol>>()
+
+            Log.d("REQUEST", "${data?.data}")
+            var iss : InputStream? = null
+            if(data != null) {
+                iss = contentResolver.openInputStream(data.data!!)
+                iss?.bufferedReader()?.forEachLine { line ->
+                    Log.d("REQUEST_READ", line.split(" ").toString())
+                    val lineArr = line.split(" ")
+                    Log.d("REQUEST", "${lineArr.size}")
+                    if(lineArr.size != 2) {
+                        errorRead.show()
+                        return@forEachLine
+                    }
+
+                    val mac = lineArr[0]
+                    val protocol = Beacon.Protocol.fromString(lineArr[1])
+
+                    if(!mac.matches(Regex("([A-Fa-f0-9]{2}:){5}[A-Fa-f0-9]{2}")) || protocol == null) {
+                        errorRead.show()
+                        return@forEachLine
+                    }
+
+                    tmpWhiteList.add(Pair(mac, protocol))
+                }
+            }
+
+            BLEScanner.allowAllBeacons()
+            tmpWhiteList.forEach {
+                val mac = it.first
+                val protocol = it.second
+                BLEScanner.allowBeacon(mac, protocol)
+            }
+            whiteListAdapter.notifyDataSetChanged()
+        }
     }
 }

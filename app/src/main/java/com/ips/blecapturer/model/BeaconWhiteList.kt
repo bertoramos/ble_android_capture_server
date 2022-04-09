@@ -2,7 +2,7 @@ package com.ips.blecapturer.model
 
 class BeaconWhiteList {
 
-    private val beaconWhiteList = arrayListOf<Pair<String, Beacon.Protocol>>() // MAC & Protocol
+    val beaconWhiteList = arrayListOf<Pair<String, Beacon.Protocol>>() // MAC & Protocol
 
     /*
     init {
@@ -12,10 +12,15 @@ class BeaconWhiteList {
         beaconWhiteList.add(Pair("06:05:04:03:02:01", Beacon.Protocol.EDDYSTONE))
         beaconWhiteList.add(Pair("06:05:04:03:02:01", Beacon.Protocol.IBEACON))
     }
-     */
+    */
+
+    fun contains(mac: String, protocol: Beacon.Protocol): Boolean {
+        return beaconWhiteList.contains(Pair(mac, protocol))
+    }
 
     fun addBeacon(mac: String, protocol: Beacon.Protocol) {
-        beaconWhiteList.add(Pair(mac, protocol))
+        var p = Pair(mac, protocol)
+        if(!beaconWhiteList.contains(p)) beaconWhiteList.add(p)
     }
 
     fun removeBeacon(mac:String, protocol: Beacon.Protocol) {
