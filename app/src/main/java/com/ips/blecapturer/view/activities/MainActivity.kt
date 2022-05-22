@@ -1,7 +1,9 @@
 package com.ips.blecapturer.view.activities
 
+import android.content.DialogInterface
 import android.os.Bundle
 import android.util.Log
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.navigation.fragment.NavHostFragment
@@ -19,10 +21,7 @@ class MainActivity : AppCompatActivity() {
 
     private lateinit var active: Fragment
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
-
+    fun create_view() {
         server_fragment = ServerFragment()
         scanner_fragment = BleFragment()
         active = scanner_fragment
@@ -54,6 +53,39 @@ class MainActivity : AppCompatActivity() {
         nav_buttons.setOnItemReselectedListener {
 
         }
+    }
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_main)
+
+        val currentVersion = android.os.Build.VERSION.SDK_INT
+        val minVersion = android.os.Build.VERSION_CODES.O
+        if(currentVersion >= minVersion) {
+            create_view()
+        } else {
+            runOnUiThread {
+                val builder = AlertDialog.Builder(this)
+                builder.setTitle(title)
+                builder.setMessage("The current API version is $currentVersion. The minimum version is $minVersion.")
+                builder.setIcon(android.R.drawable.ic_dialog_alert)
+                builder.setPositiveButton("Close app") { _, _ ->
+                    finishAndRemoveTask()
+                }
+
+                // Create the AlertDialog
+                val alertDialog: AlertDialog = builder.create()
+
+                // Set other dialog properties
+                alertDialog.setCancelable(false)
+
+                alertDialog.show()
+            }
+            Log.d("SDK_ERROR", "The current API version is $currentVersion. The minimum version is $minVersion.")
+
+        }
+
+
     }
 
 

@@ -126,11 +126,10 @@ class ServerFragment : Fragment() {
     private fun offServer() {
         thread (start = true) {
             ConnectionHandler.sendServerClosePacket()
-
             ConnectionHandler.disconnect()
-            view?.findViewById<TextView>(R.id.serverIPTextView)?.text = ""
-            view?.findViewById<TextView>(R.id.clientIPTextView)?.text = ""
         }
+        view?.findViewById<TextView>(R.id.serverIPTextView)?.text = ""
+        view?.findViewById<TextView>(R.id.clientIPTextView)?.text = ""
     }
 
     private fun create_campaign(view: View, dbname: String) {
