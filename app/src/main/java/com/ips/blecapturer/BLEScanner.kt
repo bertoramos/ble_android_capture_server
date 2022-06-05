@@ -24,6 +24,12 @@ import kotlin.collections.ArrayList
 
 object BLEScanner {
 
+    var timestamp: Long = 0L
+    var xco : Float = 0f
+    var yco : Float = 0f
+    var zco : Float = 0f
+    var yaw : Float = 0f
+
     private lateinit var btScanner: BluetoothLeScanner
     private lateinit var btAdapter: BluetoothAdapter
     private lateinit var btManager: BluetoothManager
@@ -81,7 +87,7 @@ object BLEScanner {
         return btAdapter.isEnabled
     }
 
-    fun startScanner(x: Float, y: Float, z: Float, yaw: Float)
+    fun startScanner()
     {
         btScanner.startScan(leScanCallback)
 
@@ -91,12 +97,14 @@ object BLEScanner {
         val z = bleViewModel.getZco() ?: 0.0f
         val yaw = bleViewModel.getYaw() ?: 0.0f
         */
-
+        /*
         Log.d("START_SCANNER", "$x $y $z  $bleViewModel")
 
         val pos = Pose(x, y, z, yaw)
         val timestamp = Date().time
         DatabaseHandler.databaseViewModel?.insertCapture(timestamp, pos)
+
+         */
     }
 
     fun stopScanner()
@@ -105,11 +113,6 @@ object BLEScanner {
     }
 
     private val leScanCallback: ScanCallback = object : ScanCallback() {
-
-        override fun onScanFailed(errorCode: Int) {
-            // TODO: Control de error
-            super.onScanFailed(errorCode)
-        }
 
 
         @RequiresApi(Build.VERSION_CODES.O)
@@ -123,7 +126,8 @@ object BLEScanner {
             var beacon_type = Beacon.Protocol.OTHER
             val rssi = result?.rssi
             val txpower = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) result?.txPower ?: 0 else 0
-            val timestamp = Date().time
+
+            val timestamp_ble = Date().time
 
             // GET BEACON TYPE
             if(scanRecord != null)
@@ -148,11 +152,24 @@ object BLEScanner {
                 allowed = beaconWhiteList.filter(beacon)
 
                 bleViewModel.addBeacon(beacon)
+                /*
+                val timestamp_pos: Long = bleViewModel.getTimestampPos() ?: 0L
+                val xcoo: Float = bleViewModel.getXco() ?: 0.0f
+                val ycoo: Float = bleViewModel.getYco() ?: 0.0f
+                val zcoo: Float = bleViewModel.getZco() ?: 0.0f
+                val yaw: Float  = bleViewModel.getYaw() ?: 0.0f
+                //Log.d("CAPTURE_POS", "POS $timestamp_pos $xcoo $ycoo $zcoo $yaw")
 
-                if(beaconWhiteList.size() == 0) {
-                    DatabaseHandler.databaseViewModel?.insertScan(timestamp, deviceAddress, beacon_type, rssi, txpower)
-                } else if(allowed) {
-                    DatabaseHandler.databaseViewModel?.insertScan(timestamp, deviceAddress, beacon_type, rssi, txpower)
+                 */
+                val timestamp_pos: Long = BLEScanner.timestamp
+                val xcoo: Float = BLEScanner.xco
+                val ycoo: Float = BLEScanner.yco
+                val zcoo: Float = BLEScanner.zco
+                val yaw: Float  = BLEScanner.yaw
+                val pose = Pose(xcoo, ycoo, zcoo, yaw)
+
+                if(beaconWhiteList.size() == 0 || allowed) {
+                    DatabaseHandler.databaseViewModel?.insertScan(timestamp_ble, timestamp_pos, deviceAddress, beacon_type, rssi, txpower, pose)
                 }
             }
 

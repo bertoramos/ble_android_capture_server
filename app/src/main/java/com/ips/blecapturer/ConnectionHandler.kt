@@ -1,6 +1,7 @@
 package com.ips.blecapturer
 
 
+import android.content.Context
 import android.util.Log
 import android.view.View
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -12,8 +13,9 @@ object ConnectionHandler {
 
     var server: UDPServer? = null
 
-    fun connect(clientPort: Int, serverPort: Int) {
+    fun connect(clientPort: Int, serverPort: Int, context: Context?) {
         server = UDPServer(clientPort, serverPort)
+        server!!.setContext(context)
         if(server != null) {
             server!!.start()
         }

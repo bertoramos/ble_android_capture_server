@@ -101,7 +101,7 @@ class BleFragment : Fragment() {
             val bleActive = BLEScanner.isEnabled()
             if(!scan_flag_button) {
                 if(locationPermissionGranted && bleActive) {
-                    BLEScanner.startScanner(0F, 0F, 0F, 0F)
+                    BLEScanner.startScanner()
                     scan_flag_button = true
                     scanButton.setImageDrawable(ContextCompat.getDrawable(view.context, R.drawable.ic_search_foreground_24dp))
                 } else {

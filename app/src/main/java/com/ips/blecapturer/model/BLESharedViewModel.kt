@@ -9,6 +9,10 @@ class BLESharedViewModel : ViewModel() {
         MutableLiveData<HashMap<Pair<String, Beacon.Protocol>, Beacon>>()
     }
 
+    private val last_timestamp_pos by lazy {
+        MutableLiveData<Long>()
+    }
+
     private val last_xco by lazy {
         MutableLiveData<Float>()
     }
@@ -39,7 +43,8 @@ class BLESharedViewModel : ViewModel() {
         return beacons_live_map.value?.get(Pair(mac, protocol))
     }
 
-    fun addPose(x: Float, y: Float, z: Float, yaw: Float) {
+    fun addPose(timestamp_pos: Long, x: Float, y: Float, z: Float, yaw: Float) {
+        last_timestamp_pos.postValue(timestamp_pos)
         last_xco.postValue(x)
         last_yco.postValue(y)
         last_zco.postValue(z)
@@ -50,5 +55,6 @@ class BLESharedViewModel : ViewModel() {
     fun getYco(): Float? = last_yco.value
     fun getZco(): Float? = last_zco.value
     fun getYaw(): Float? = last_yaw.value
+    fun getTimestampPos(): Long? = last_timestamp_pos.value
 
 }

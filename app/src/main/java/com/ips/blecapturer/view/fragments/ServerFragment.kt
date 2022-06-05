@@ -110,7 +110,7 @@ class ServerFragment : Fragment() {
         val clientPort = DEFAULT_CLIENT_PORT
         val serverPort = DEFAULT_SERVER_PORT
 
-        ConnectionHandler.connect(clientPort, serverPort)
+        ConnectionHandler.connect(clientPort, serverPort, context)
         ConnectionHandler.setBLESharedViewModel(bleViewModel)
         view?.let { ConnectionHandler.setView(it) }
 

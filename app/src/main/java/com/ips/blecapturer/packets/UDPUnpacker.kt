@@ -1,5 +1,6 @@
 package com.ips.blecapturer.packets
 
+import com.ips.blecapturer.model.database.tables.Pose
 import org.msgpack.core.MessagePack
 import org.msgpack.core.MessageUnpacker
 
@@ -21,6 +22,7 @@ object UDPUnpacker {
                 StartCapturePacket.PTYPE -> unpackStartCapturePacket(pid, ptype, unpacker, len)
                 EndCapturePacket.PTYPE -> unpackEndCapturePacket(pid, ptype, unpacker, len)
                 CloseServerPacket.PTYPE -> unpackCloseServerPacket(pid, ptype, unpacker, len)
+                PosePacket.PTYPE -> unpackPosePacket(pid, ptype, unpacker, len)
                 else -> null
             }
 
@@ -46,13 +48,8 @@ object UDPUnpacker {
     }
 
     private fun unpackStartCapturePacket(pid: Long, ptype: Int, unpacker: MessageUnpacker, size: Int): StartCapturePacket? {
-        if(size == 7) {
-            val captureTime = unpacker.unpackFloat()
-            val xco = unpacker.unpackFloat()
-            val yco = unpacker.unpackFloat()
-            val zco = unpacker.unpackFloat()
-            val yaw = unpacker.unpackFloat()
-            return StartCapturePacket(pid, captureTime, xco, yco, zco, yaw)
+        if(size == 2) {
+            return StartCapturePacket(pid)
         }
         return null
     }
@@ -70,4 +67,18 @@ object UDPUnpacker {
         }
         return null
     }
+
+
+    private fun unpackPosePacket(pid: Long, ptype: Int, unpacker: MessageUnpacker, size: Int): PosePacket? {
+        if(size == 7) {
+            val timestamp = unpacker.unpackLong()
+            val x = unpacker.unpackFloat()
+            val y = unpacker.unpackFloat()
+            val z = unpacker.unpackFloat()
+            val yaw = unpacker.unpackFloat()
+            return PosePacket(pid, timestamp, x, y, z, yaw)
+        }
+        return null
+    }
+
 }

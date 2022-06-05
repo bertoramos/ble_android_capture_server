@@ -1,6 +1,7 @@
 package com.ips.blecapturer.packets
 
 import android.os.Message
+import com.ips.blecapturer.model.database.tables.Pose
 import org.msgpack.core.MessagePack
 
 object UDPPacker {
@@ -15,6 +16,7 @@ object UDPPacker {
             StartCapturePacket.PTYPE -> packStartPacket(packet as StartCapturePacket)
             EndCapturePacket.PTYPE -> packEndPacket(packet as EndCapturePacket)
             CloseServerPacket.PTYPE -> packCloseServerPacket(packet as CloseServerPacket)
+            PosePacket.PTYPE -> packPosePacket(packet as PosePacket)
             else -> null
         }
     }
@@ -52,14 +54,9 @@ object UDPPacker {
     fun packStartPacket(packet: StartCapturePacket): ByteArray {
         val packer = MessagePack.newDefaultBufferPacker()
         packer
-            .packArrayHeader(7)
+            .packArrayHeader(2)
             .packLong(packet.pid)
             .packInt(packet.ptype)
-            .packFloat(packet.captureTime)
-            .packFloat(packet.x)
-            .packFloat(packet.y)
-            .packFloat(packet.z)
-            .packFloat(packet.yaw)
         return packer.toByteArray()
     }
 
@@ -78,6 +75,20 @@ object UDPPacker {
             .packArrayHeader(2)
             .packLong(packet.pid)
             .packInt(packet.ptype)
+        return packer.toByteArray()
+    }
+
+    fun packPosePacket(packet: PosePacket): ByteArray {
+        val packer = MessagePack.newDefaultBufferPacker()
+        packer
+            .packArrayHeader(7)
+            .packLong(packet.pid)
+            .packInt(packet.ptype)
+            .packLong(packet.timestamp)
+            .packFloat(packet.x)
+            .packFloat(packet.y)
+            .packFloat(packet.z)
+            .packFloat(packet.yaw)
         return packer.toByteArray()
     }
 }

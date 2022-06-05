@@ -1,21 +1,25 @@
 package com.ips.blecapturer
 
+import android.app.Activity
+import android.content.Context
 import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.ips.blecapturer.model.BLESharedViewModel
 import com.ips.blecapturer.model.database.DatabaseHandler
+import com.ips.blecapturer.model.database.tables.Pose
 import com.ips.blecapturer.packets.*
 import java.lang.Exception
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 import kotlin.concurrent.thread
+import kotlin.coroutines.coroutineContext
 
 class UDPServer(clientPort: Int, serverPort: Int): Thread() {
 
     companion object {
-        val ack_packet_types = listOf(ModePacket.PTYPE, StartCapturePacket.PTYPE)
+        val ack_packet_types = listOf(ModePacket.PTYPE, StartCapturePacket.PTYPE, EndCapturePacket.PTYPE)
     }
     var last_pid_recv = 0L
     var last_pid_sent = 0L
@@ -29,10 +33,13 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
     var serverPort: Int = serverPort // 4445
     var socket: DatagramSocket? = null
 
+    var appContext: Context? = null
+
     var buffer: ArrayList<Packet> = ArrayList()
 
     private lateinit var bleViewModel: BLESharedViewModel
     private lateinit var view: View
+
 
     fun setBLESharedViewModel(bleViewModel: BLESharedViewModel) {
         this.bleViewModel = bleViewModel
@@ -40,6 +47,10 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
 
     fun setView(v: View) {
         view = v
+    }
+
+    fun setContext(c: Context?) {
+        appContext = c
     }
 
     fun closeSocket() {
@@ -87,7 +98,10 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
                 last_pid_recv = 0L
                 last_pid_sent = 0L
 
-                view?.findViewById<TextView>(R.id.clientIPTextView)?.text = ""
+                (appContext as Activity).runOnUiThread {
+                    view?.findViewById<TextView>(R.id.clientIPTextView)?.text = ""
+                }
+
             }
         }
     }
@@ -98,7 +112,10 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
                 clientAddr = address
                 startMode = true
 
-                view?.findViewById<TextView>(R.id.clientIPTextView)?.text = "Client: ${clientAddr?.hostAddress}"
+                (appContext as Activity).runOnUiThread {
+                    view?.findViewById<TextView>(R.id.clientIPTextView)?.text = "Client: ${clientAddr?.hostAddress}"
+                }
+
             }
         }
     }
@@ -131,8 +148,26 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
                             if(packet.ptype == ModePacket.PTYPE) {
                                 Log.d("UDPSERVER", "Es un paquete de modo")
                                 checkStart(packet as ModePacket, addr)
-                                if(packet.ptype in ack_packet_types) sendAckPacket(packet, AckPacket.STATUS_OK)
+                                if (packet.ptype in ack_packet_types) sendAckPacket(
+                                    packet,
+                                    AckPacket.STATUS_OK
+                                )
                                 checkStop(packet)
+                            } else if(packet.ptype == PosePacket.PTYPE) {
+                                Log.d("CURRENT_POS", packet.toString())
+                                BLEScanner.timestamp = (packet as PosePacket).timestamp
+                                BLEScanner.xco = (packet as PosePacket).x
+                                BLEScanner.yco = (packet as PosePacket).y
+                                BLEScanner.zco = (packet as PosePacket).z
+                                BLEScanner.yaw = (packet as PosePacket).yaw
+
+                                /*val timestamp = (packet as PosePacket).timestamp
+                                val x = (packet as PosePacket).x
+                                val y = (packet as PosePacket).y
+                                val z = (packet as PosePacket).z
+                                val yaw = (packet as PosePacket).yaw
+                                bleViewModel.addPose(timestamp, x, y, z, yaw)
+                                *///Log.d("CURRENT_POS", "${bleViewModel.getTimestampPos()} ${bleViewModel.getXco()} ${bleViewModel.getYco()} ${bleViewModel.getZco()} ${bleViewModel.getYaw()}")
                             } else {
                                 buffer.add(packet)
                                 if(packet.ptype in ack_packet_types) sendAckPacket(packet, AckPacket.STATUS_OK)
@@ -165,41 +200,68 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
     }
 
     private fun checkRecvPacket(packet: Packet) {
-
         if(packet.ptype == StartCapturePacket.PTYPE) {
             // Start capture thread
-            thread(start=true) {
-                val startCapturePacket = (packet as StartCapturePacket)
-                val captureTime = (startCapturePacket.captureTime * 1000).toLong()
-
-                Log.d("CAPTURE_POS", "${startCapturePacket.x} ${startCapturePacket.y} ${startCapturePacket.z} ${startCapturePacket.yaw}")
-                bleViewModel.addPose(startCapturePacket.x, startCapturePacket.y, startCapturePacket.z, startCapturePacket.yaw)
-                Log.d("CAPTURE_POS", "X: ${bleViewModel.getXco()} Y: ${bleViewModel.getYco()} Z: ${bleViewModel.getZco()} YAW: ${bleViewModel.getYaw()}")
-                val db = DatabaseHandler.databaseViewModel?.databaseHelper?.value?.writableDatabase
-                Log.d("DBHANDLER", "$db ${db == null}")
-                if(db != null) {
-                    try {
-                        db.beginTransaction()
-
-                        BLEScanner.startScanner(startCapturePacket.x, startCapturePacket.y, startCapturePacket.z, startCapturePacket.yaw)
-                        sleep(captureTime)
-                        BLEScanner.stopScanner()
-
-                        db.setTransactionSuccessful()
-
-                    } catch(e: Exception) {
-                        e.printStackTrace()
-                    } finally {
-                        db.endTransaction()
-                    }
-                }
-
-                last_pid_sent += 1
-                val pid = last_pid_sent
-                ConnectionHandler.sendEndCapture(pid)
-                // buffer.remove(packet)
-            }
+            Log.d("CAPTURE", "START")
+            start_capture_thread(packet)
         }
+        if(packet.ptype == EndCapturePacket.PTYPE) {
+            // Stop capture thread
+            Log.d("CAPTURE", "STOP")
+            stop_capture_thread(packet)
+        }
+
+    }
+
+    private fun stop_capture_thread(packet: Packet) {
+        //thread(start=true) {
+            val db = DatabaseHandler.databaseViewModel?.databaseHelper?.value?.writableDatabase
+            if(db != null) {
+                try {
+                    BLEScanner.stopScanner()
+                    db.setTransactionSuccessful()
+                } catch(e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    db.endTransaction()
+                }
+            }
+        //}
+    }
+
+    private fun start_capture_thread(packet: Packet) {
+        //thread(start=true) {
+            val startCapturePacket = (packet as StartCapturePacket)
+            //val captureTime = (startCapturePacket.captureTime * 1000).toLong()
+
+            //Log.d("CAPTURE_POS", "${startCapturePacket.x} ${startCapturePacket.y} ${startCapturePacket.z} ${startCapturePacket.yaw}")
+            //bleViewModel.addPose(startCapturePacket.x, startCapturePacket.y, startCapturePacket.z, startCapturePacket.yaw)
+            //Log.d("CAPTURE_POS", "X: ${bleViewModel.getXco()} Y: ${bleViewModel.getYco()} Z: ${bleViewModel.getZco()} YAW: ${bleViewModel.getYaw()}")
+
+            val db = DatabaseHandler.databaseViewModel?.databaseHelper?.value?.writableDatabase
+            Log.d("DBHANDLER", "$db ${db == null}")
+            if(db != null) {
+                try {
+                    db.beginTransaction()
+
+                    BLEScanner.startScanner()
+                    //sleep(captureTime)
+                    //BLEScanner.stopScanner()
+
+                    //db.setTransactionSuccessful()
+
+                } catch(e: Exception) {
+                    e.printStackTrace()
+                } finally {
+                    //db.endTransaction()
+                }
+            }
+
+            //last_pid_sent += 1
+            //val pid = last_pid_sent
+            //ConnectionHandler.sendEndCapture(pid)
+            // buffer.remove(packet)
+       // }
     }
 
 }

@@ -17,9 +17,9 @@ class CampaignDatabaseHelper(val context: Context, private val database_name: St
     val database_file_name = "$database_name$DB_EXTENSION"
 
     override fun onCreate(db: SQLiteDatabase) {
-        db.execSQL(Capture.DROP_TABLE)
+        //db.execSQL(Capture.DROP_TABLE)
         db.execSQL(Scan.DROP_TABLE)
-        db.execSQL(Capture.CREATE_TABLE)
+        //db.execSQL(Capture.CREATE_TABLE)
         db.execSQL(Scan.CREATE_TABLE)
     }
 
