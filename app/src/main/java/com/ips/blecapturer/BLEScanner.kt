@@ -91,6 +91,7 @@ object BLEScanner {
     {
         btScanner.startScan(leScanCallback)
 
+
         /*
         val x = bleViewModel.getXco() ?: 0.0f
         val y = bleViewModel.getYco() ?: 0.0f

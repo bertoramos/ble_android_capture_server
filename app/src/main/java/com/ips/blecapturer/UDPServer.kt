@@ -2,25 +2,28 @@ package com.ips.blecapturer
 
 import android.app.Activity
 import android.content.Context
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.View
 import android.widget.TextView
 import com.ips.blecapturer.model.BLESharedViewModel
 import com.ips.blecapturer.model.database.DatabaseHandler
-import com.ips.blecapturer.model.database.tables.Pose
 import com.ips.blecapturer.packets.*
 import java.lang.Exception
 import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
-import kotlin.concurrent.thread
-import kotlin.coroutines.coroutineContext
+import java.util.Locale
 
 class UDPServer(clientPort: Int, serverPort: Int): Thread() {
 
     companion object {
         val ack_packet_types = listOf(ModePacket.PTYPE, StartCapturePacket.PTYPE, EndCapturePacket.PTYPE)
     }
+
+    private var isTtsReady: Boolean = false
+    private var tts: TextToSpeech? = null
+
     var last_pid_recv = 0L
     var last_pid_sent = 0L
 
@@ -102,6 +105,7 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
                     view?.findViewById<TextView>(R.id.clientIPTextView)?.text = ""
                 }
 
+                speak_tts("Server connection closed")
             }
         }
     }
@@ -116,18 +120,66 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
                     view?.findViewById<TextView>(R.id.clientIPTextView)?.text = "Client: ${clientAddr?.hostAddress}"
                 }
 
+                speak_tts("Connection to server established")
             }
+        }
+    }
+
+    private fun open_tts(context: Context?)
+    {
+        Log.d("TTS_BLE", "Initializing TTS...")
+
+        tts = TextToSpeech(
+            appContext
+        ) { i ->
+            // if No error is found then only it will run
+            if (i != TextToSpeech.ERROR) {
+                // To Choose language of speech
+                tts?.setLanguage(Locale.UK)
+
+                tts!!.setPitch(1.2f)
+                tts!!.setSpeechRate(0.95f)
+
+                isTtsReady = true
+            } else {
+                Log.e("TTS_BLE", "Error initializing TextToSpeech");
+            }
+        }
+        // Wait until started
+        sleep(1000)
+        //while(!isTtsReady) {}
+    }
+
+    private fun close_tts()
+    {
+        tts?.stop()
+        tts?.shutdown()
+
+        isTtsReady = false
+        tts = null
+    }
+
+    private fun speak_tts(text: String)
+    {
+        if(isTtsReady) {
+            tts?.speak(text, TextToSpeech.QUEUE_FLUSH, null, null)
+        } else {
+            Log.d("TTS_BLE", "TTS NOT READY")
         }
     }
 
     override fun run()
     {
+        // OPEN TTS
+        open_tts(appContext)
+
         this.is_running = true
 
         try {
 
             socket = DatagramSocket(serverPort)
             Log.d("BLECapturer", "socket open")
+            speak_tts("Server is live")
 
             while(this.is_running)
             {
@@ -195,6 +247,12 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
             } else {
                 Log.d("BLECapturer", "socket not closed")
             }
+
+            speak_tts("Server is now offline")
+            sleep(2000)
+
+            // close tts
+            close_tts()
         }
 
     }
@@ -204,11 +262,13 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
             // Start capture thread
             Log.d("CAPTURE", "START")
             start_capture_thread(packet)
+            speak_tts("Capture started")
         }
         if(packet.ptype == EndCapturePacket.PTYPE) {
             // Stop capture thread
             Log.d("CAPTURE", "STOP")
             stop_capture_thread(packet)
+            speak_tts("Capture stopped")
         }
 
     }

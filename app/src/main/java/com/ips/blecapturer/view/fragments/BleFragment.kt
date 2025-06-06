@@ -25,12 +25,14 @@ import com.ips.blecapturer.model.BLESharedViewModel
 import com.ips.blecapturer.model.database.CampaignDatabaseHelper
 import com.ips.blecapturer.model.database.DatabaseHandler
 import com.ips.blecapturer.view.BleDeviceAdapter
+import java.util.Locale
 
 
 class BleFragment : Fragment() {
 
     private val ble_model : BLESharedViewModel by viewModels()
     private var scan_flag_button = false
+
 
     companion object {
         private const val REQUEST_ENABLE_BT = 1
@@ -62,6 +64,10 @@ class BleFragment : Fragment() {
         bleDevicesList(inflaterView)
 
         return inflaterView
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
     @RequiresApi(Build.VERSION_CODES.M)
@@ -97,6 +103,8 @@ class BleFragment : Fragment() {
     private fun scanButtonSetup(view: View) {
         val scanButton = view.findViewById<FloatingActionButton>(R.id.scan_button)
         scanButton.setOnClickListener {
+
+
             val locationPermissionGranted = activity!!.checkSelfPermission(Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED
             val bleActive = BLEScanner.isEnabled()
             if(!scan_flag_button) {

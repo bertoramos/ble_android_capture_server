@@ -24,6 +24,7 @@ import com.ips.blecapturer.model.BLESharedViewModel
 import com.ips.blecapturer.model.database.DatabaseHandler
 import com.ips.blecapturer.model.database.DatabaseViewModel
 import com.ips.blecapturer.view.activities.WhiteListActivity
+import java.util.Locale
 import kotlin.concurrent.thread
 
 
@@ -43,6 +44,11 @@ class ServerFragment : Fragment() {
         super.onCreate(savedInstanceState)
 
         DatabaseHandler.databaseViewModel = database_view_model
+
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 
     override fun onCreateView(
@@ -75,6 +81,7 @@ class ServerFragment : Fragment() {
                         R.drawable.ic_power_off_24dp_foreground
                     )
                     serverButton.text = resources.getText(R.string.off_mini)
+
                     false
                 } else {
                     onServer()
