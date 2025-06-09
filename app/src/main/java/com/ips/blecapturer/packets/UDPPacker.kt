@@ -17,6 +17,8 @@ object UDPPacker {
             EndCapturePacket.PTYPE -> packEndPacket(packet as EndCapturePacket)
             CloseServerPacket.PTYPE -> packCloseServerPacket(packet as CloseServerPacket)
             PosePacket.PTYPE -> packPosePacket(packet as PosePacket)
+            StartTimedCapturePacket.PTYPE -> packStartTimedCapturePacket(packet as StartTimedCapturePacket)
+            EndTimedCapturePacket.PTYPE -> packEndTimedCapturePacket(packet as EndTimedCapturePacket)
             else -> null
         }
     }
@@ -89,6 +91,26 @@ object UDPPacker {
             .packFloat(packet.y)
             .packFloat(packet.z)
             .packFloat(packet.yaw)
+        return packer.toByteArray()
+    }
+
+    fun packStartTimedCapturePacket(packet: StartTimedCapturePacket): ByteArray {
+        val packer = MessagePack.newDefaultBufferPacker()
+        packer
+            .packArrayHeader(3)
+            .packLong(packet.pid)
+            .packInt(packet.ptype)
+            .packFloat(packet.captureTime)
+        return packer.toByteArray()
+    }
+
+    fun packEndTimedCapturePacket(packet: EndTimedCapturePacket): ByteArray {
+        val packer = MessagePack.newDefaultBufferPacker()
+        packer
+            .packArrayHeader(2)
+            .packLong(packet.pid)
+            .packInt(packet.ptype)
+
         return packer.toByteArray()
     }
 }

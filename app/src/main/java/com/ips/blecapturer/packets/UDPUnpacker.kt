@@ -23,6 +23,8 @@ object UDPUnpacker {
                 EndCapturePacket.PTYPE -> unpackEndCapturePacket(pid, ptype, unpacker, len)
                 CloseServerPacket.PTYPE -> unpackCloseServerPacket(pid, ptype, unpacker, len)
                 PosePacket.PTYPE -> unpackPosePacket(pid, ptype, unpacker, len)
+                StartTimedCapturePacket.PTYPE -> unpackStartTimedCapturePacket(pid, ptype, unpacker, len)
+                EndTimedCapturePacket.PTYPE -> unpackEndTimedCapturePacket(pid, ptype, unpacker, len)
                 else -> null
             }
 
@@ -78,6 +80,24 @@ object UDPUnpacker {
             val yaw = unpacker.unpackFloat()
             return PosePacket(pid, timestamp, x, y, z, yaw)
         }
+        return null
+    }
+
+    private fun unpackStartTimedCapturePacket(pid: Long, ptype: Int, unpacker: MessageUnpacker, size: Int): StartTimedCapturePacket? {
+        if(size == 3) {
+            val captureTime = unpacker.unpackFloat()
+
+            return StartTimedCapturePacket(pid, captureTime)
+        }
+
+        return null
+    }
+
+    private fun unpackEndTimedCapturePacket(pid: Long, ptype: Int, unpacker: MessageUnpacker, size: Int): EndTimedCapturePacket? {
+        if(size == 2) {
+            return EndTimedCapturePacket(pid)
+        }
+
         return null
     }
 

@@ -104,4 +104,20 @@ object ConnectionHandler {
         return false
     }
 
+    fun sendEndTimedCapture(pid: Long) : Boolean {
+        if(server != null) {
+            val packet = EndTimedCapturePacket(pid)
+            val bytes = UDPPacker.pack(packet)
+
+            if(bytes != null) server!!.sendPacket(bytes)
+
+            // Wait ACK
+            var currentTime = System.currentTimeMillis()
+            while(abs(System.currentTimeMillis() - currentTime) < 8000) {
+                if (wasAck(packet.pid)) return true
+            }
+        }
+        return false
+    }
+
 }

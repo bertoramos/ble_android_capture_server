@@ -14,11 +14,12 @@ import java.net.DatagramPacket
 import java.net.DatagramSocket
 import java.net.InetAddress
 import java.util.Locale
+import kotlin.concurrent.thread
 
 class UDPServer(clientPort: Int, serverPort: Int): Thread() {
 
     companion object {
-        val ack_packet_types = listOf(ModePacket.PTYPE, StartCapturePacket.PTYPE, EndCapturePacket.PTYPE)
+        val ack_packet_types = listOf(ModePacket.PTYPE, StartCapturePacket.PTYPE, EndCapturePacket.PTYPE, StartTimedCapturePacket.PTYPE)
     }
 
     private var isTtsReady: Boolean = false
@@ -261,19 +262,40 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
         if(packet.ptype == StartCapturePacket.PTYPE) {
             // Start capture thread
             Log.d("CAPTURE", "START")
-            start_capture_thread(packet)
+            start_capture_thread()
             speak_tts("Capture started")
         }
         if(packet.ptype == EndCapturePacket.PTYPE) {
             // Stop capture thread
             Log.d("CAPTURE", "STOP")
-            stop_capture_thread(packet)
+            stop_capture_thread()
             speak_tts("Capture stopped")
         }
+        if(packet.ptype == StartTimedCapturePacket.PTYPE) {
+            // Start timed capture
+            thread(start=true) {
+                val startTimedCapturePacket = (packet as StartTimedCapturePacket)
+                val captureTime = (startTimedCapturePacket.captureTime * 1000).toLong()
 
+                //  CAPTURE START
+                speak_tts("Starting capture for ${startTimedCapturePacket.captureTime} seconds")
+                start_capture_thread()
+
+                sleep(captureTime)
+
+                //  CAPTURE STOP
+                stop_capture_thread()
+                speak_tts("Capture completed")
+
+
+                last_pid_sent += 1
+                val pid = last_pid_sent
+                ConnectionHandler.sendEndTimedCapture(pid)
+            }
+        }
     }
 
-    private fun stop_capture_thread(packet: Packet) {
+    private fun stop_capture_thread() {
         //thread(start=true) {
             val db = DatabaseHandler.databaseViewModel?.databaseHelper?.value?.writableDatabase
             if(db != null) {
@@ -289,9 +311,8 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
         //}
     }
 
-    private fun start_capture_thread(packet: Packet) {
+    private fun start_capture_thread() {
         //thread(start=true) {
-            val startCapturePacket = (packet as StartCapturePacket)
             //val captureTime = (startCapturePacket.captureTime * 1000).toLong()
 
             //Log.d("CAPTURE_POS", "${startCapturePacket.x} ${startCapturePacket.y} ${startCapturePacket.z} ${startCapturePacket.yaw}")
