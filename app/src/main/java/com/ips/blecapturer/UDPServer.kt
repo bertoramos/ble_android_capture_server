@@ -277,16 +277,15 @@ class UDPServer(clientPort: Int, serverPort: Int): Thread() {
                 val startTimedCapturePacket = (packet as StartTimedCapturePacket)
                 val captureTime = (startTimedCapturePacket.captureTime * 1000).toLong()
 
-                //  CAPTURE START
+                // CAPTURE START
                 speak_tts("Starting capture for ${startTimedCapturePacket.captureTime} seconds")
                 start_capture_thread()
 
                 sleep(captureTime)
 
-                //  CAPTURE STOP
+                // CAPTURE STOP
                 stop_capture_thread()
                 speak_tts("Capture completed")
-
 
                 last_pid_sent += 1
                 val pid = last_pid_sent

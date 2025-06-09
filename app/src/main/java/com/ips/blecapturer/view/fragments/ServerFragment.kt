@@ -3,6 +3,8 @@ package com.ips.blecapturer.view.fragments
 import android.Manifest
 import android.content.Context
 import android.content.Intent
+import android.content.res.ColorStateList
+import android.graphics.Color
 import android.net.wifi.WifiManager
 import android.os.Bundle
 import android.text.format.Formatter
@@ -63,6 +65,11 @@ class ServerFragment : Fragment() {
         //}
 
         val serverButton = inflateView.findViewById<MaterialButton>(R.id.serverButton)
+        val originalTint: ColorStateList? = serverButton.backgroundTintList  // Store original background tint
+        val offServerTint = ColorStateList.valueOf(Color.GRAY)
+
+        serverButton.backgroundTintList = offServerTint
+
         serverButton.setOnClickListener {
             if(!BLEScanner.isEnabled()) {
                 val builder = android.app.AlertDialog.Builder(context)
@@ -82,6 +89,9 @@ class ServerFragment : Fragment() {
                     )
                     serverButton.text = resources.getText(R.string.off_mini)
 
+                    // sserverButton.setBackgroundColor(color)
+                    serverButton.backgroundTintList = offServerTint
+
                     false
                 } else {
                     onServer()
@@ -90,6 +100,8 @@ class ServerFragment : Fragment() {
                         R.drawable.ic_power_24dp_foreground
                     )
                     serverButton.text = resources.getText(R.string.on_mini)
+                    serverButton.backgroundTintList = originalTint
+
                     true
                 }
 
